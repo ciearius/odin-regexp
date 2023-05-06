@@ -16,7 +16,7 @@ import "../ast"
 
 @(test)
 test_parse :: proc(t: ^testing.T) {
-	tokens := tokenizer.tokenize(`he+llo+`)
+	tokens := tokenizer.tokenize(`he+ll(o)+`)
 
 	tree := parser.parse(tokens)
 

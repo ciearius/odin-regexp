@@ -3,12 +3,25 @@ package ast
 import "core:slice"
 
 Node :: union {
+	^Group,
 	^Match_Rune,
 	^Concatenation,
 	^Alternation,
 	^Optional,
 	^Howevermany,
 	^Atleastonce,
+}
+
+Group :: struct {
+	content: Node,
+}
+
+create_group :: proc(c: Node) -> ^Group {
+	g := new(Group)
+
+	g.content = c
+
+	return g
 }
 
 Match_Rune :: struct {
@@ -48,12 +61,38 @@ Alternation :: struct {
 	a, b: Node,
 }
 
+create_Alternation :: proc(a, b: Node) -> ^Alternation {
+	mr := new(Alternation)
+
+	mr.a = a
+	mr.b = b
+
+	return mr
+}
+
 Optional :: struct {
 	a: Node,
 }
 
+create_Optional :: proc(r: Node) -> ^Optional {
+	mr := new(Optional)
+
+	mr.a = r
+
+	return mr
+}
+
+
 Howevermany :: struct {
 	a: Node,
+}
+
+create_Howevermany :: proc(r: Node) -> ^Howevermany {
+	mr := new(Howevermany)
+
+	mr.a = r
+
+	return mr
 }
 
 Atleastonce :: struct {

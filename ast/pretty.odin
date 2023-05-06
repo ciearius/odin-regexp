@@ -8,6 +8,11 @@ prettyPrint :: proc(n: ^Node, depth: int = 0) {
 
 	switch in n {
 
+	case ^Group:
+		fmt.println(d, "Group {")
+		prettyPrint(&n.(^Group).content, depth+1)
+		fmt.println(d, "}")
+
 	case ^Match_Rune:
 		fmt.println(d, "Match_Rune {")
 		fmt.println(d, "\t", n.(^Match_Rune).r)
