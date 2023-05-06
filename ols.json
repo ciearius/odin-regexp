@@ -1,0 +1,13 @@
+{
+    "collections": [
+        {
+            "name": "core",
+            "path": "/root/Odin/core"
+        }
+    ],
+    "enable_document_symbols": true,
+    "enable_semantic_tokens": false,
+    "enable_hover": true,
+    "enable_snippets": true,
+    "odin_command": "odin"
+}
