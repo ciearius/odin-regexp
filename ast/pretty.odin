@@ -3,51 +3,60 @@ package ast
 import "core:fmt"
 import "core:strings"
 
-prettyPrint :: proc(n: ^Node, depth: int = 0) {
+prettyPrint :: proc(n: Node, depth: int = 0) {
 	d := strings.repeat("\t", depth)
 
 	switch in n {
 
 	case ^Group:
 		fmt.println(d, "Group {")
-		prettyPrint(&n.(^Group).content, depth+1)
+		prettyPrint(n.(^Group).content, depth + 1)
 		fmt.println(d, "}")
 
-	case ^Match_Rune:
-		fmt.println(d, "Match_Rune {")
-		fmt.println(d, "\t", n.(^Match_Rune).r)
+	case ^Match_Set:
+		fmt.println(d, "Match_Set {")
+		fmt.println(d, "\t", n.(^Match_Set).cset)
+		fmt.println(d, "}")
+
+	case ^Match_Range:
+		m := n.(^Match_Range)
+		fmt.println(d, "^Match_Range {")
+		fmt.println(d, ("\tnot" if m.negated else "\t"), m.range)
 		fmt.println(d, "}")
 
 	case ^Concatenation:
-		fmt.println(d, "Concatenation {")
-		cc := n.(^Concatenation)
-		for _, i in cc.nodes {
-			prettyPrint(&cc.nodes[i], depth + 1)
-		}
-		fmt.println(d, "}")
+		prettyPrint_NodeCollection("Concatenation", n.(^Concatenation), depth)
 
 	case ^Alternation:
-		alt := n.(^Alternation)
-		fmt.println(d, "Alternation {")
-		prettyPrint(&alt.a, depth + 1)
-		prettyPrint(&alt.b, depth + 1)
-		fmt.println(d, "}")
+		prettyPrint_NodeCollection("Alternation", n.(^Alternation), depth)
 
 	case ^Optional:
-		fmt.println(d, "Optional {")
-		prettyPrint(&n.(^Optional).a, depth + 1)
-		fmt.println(d, "}")
+		prettyPrint_Quantifier("Optional", n.(^Optional), depth)
 
 	case ^Howevermany:
-		fmt.println(d, "Howevermany {")
-		prettyPrint(&n.(^Howevermany).a, depth + 1)
-		fmt.println(d, "}")
-
+		prettyPrint_Quantifier("Howevermany", n.(^Howevermany), depth)
 
 	case ^Atleastonce:
-		fmt.println(d, "Atleastonce {")
-		prettyPrint(&n.(^Atleastonce).a, depth + 1)
-		fmt.println(d, "}")
-
+		prettyPrint_Quantifier("Atleastonce", n.(^Atleastonce), depth)
 	}
+}
+
+prettyPrint_Quantifier :: proc(name: string, n: ^Quantifier, depth: int = 0) {
+	d := strings.repeat("\t", depth)
+
+	fmt.println(d, name, "{")
+	prettyPrint(n.content, depth + 1)
+	fmt.println(d, "}")
+}
+
+prettyPrint_NodeCollection :: proc(name: string, n: ^NodeCollection, depth: int = 0) {
+	d := strings.repeat("\t", depth)
+
+	fmt.println(d, name, "{")
+
+	for _, i in n.nodes {
+		prettyPrint(n.nodes[i], depth + 1)
+	}
+
+	fmt.println(d, "}")
 }

@@ -1,7 +1,9 @@
 package tokenizer
 
 import "core:strconv"
-import "core:strings"
+import "core:fmt"
+
+import "../util"
 
 direct_mapped := map[rune]TokenType {
 	// symbols
@@ -11,6 +13,7 @@ direct_mapped := map[rune]TokenType {
 	'+' = .Plus,
 	'^' = .Caret,
 	'$' = .Dollar,
+	'-' = .Dash,
 
 	// Grouping
 	'(' = .Open_Paren,
@@ -19,17 +22,6 @@ direct_mapped := map[rune]TokenType {
 	']' = .Close_Bracket,
 	'{' = .Open_Brace,
 	'}' = .Close_Brace,
-}
-
-Range :: struct {
-	t:            TokenType,
-	lower, upper: rune,
-}
-
-range_mapped := [?]Range{
-	Range{.Char_Lower, 'a', 'z'},
-	Range{.Char_Upper, 'A', 'Z'},
-	Range{.Num, '0', '9'},
 }
 
 tokenize :: proc(s: string) -> (res: [dynamic]Token) {
@@ -43,7 +35,7 @@ tokenize :: proc(s: string) -> (res: [dynamic]Token) {
 		c = current(ts)
 
 		if c == '\\' {
-			ts.offset += 1
+			advance(ts)
 
 			if eof(ts) {
 				panic("unexpected eof")
@@ -58,17 +50,24 @@ tokenize :: proc(s: string) -> (res: [dynamic]Token) {
 			continue l
 		}
 
-		for r in range_mapped {
-			if r.lower <= c || c <= r.upper {
-				grab_rune(ts, r.t)
-				continue l
+		if util.is_alphanumeric(c) {
+			begin := ts.offset
+
+			for !eof(ts) {
+				c = current(ts)
+
+				if !util.is_alphanumeric(c) {
+					break
+				}
+
+				advance(ts)
 			}
+
+			grab(ts, .Alphanumeric, begin, ts.offset)
+			continue l
 		}
 
-		buf: [4]byte
-		istr := strconv.itoa(buf[:], 42)
-
-		panic(strings.concatenate({"symbol not matched ", istr}))
+		panic(fmt.aprintf("failed %r ", c))
 	}
 
 	append(&res, Token{ttype = .EOF})

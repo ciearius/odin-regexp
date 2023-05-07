@@ -4,9 +4,7 @@ TokenType :: enum {
 	// TODO: Add whitespace
 
 	// char classes
-	Num,
-	Char_Lower,
-	Char_Upper,
+	Alphanumeric,
 
 	// symbols
 	Bar,
@@ -15,6 +13,7 @@ TokenType :: enum {
 	Plus,
 	Caret,
 	Dollar,
+	Dash,
 
 	// Grouping
 	Open_Paren,

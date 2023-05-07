@@ -16,9 +16,15 @@ import "../ast"
 
 @(test)
 test_parse :: proc(t: ^testing.T) {
-	tokens := tokenizer.tokenize(`he+ll(o)+`)
+	tokens := tokenizer.tokenize(`hello[a-zA-Z]+`)
 
-	tree := parser.parse(tokens)
+	tree, err := parser.parse(tokens)
+
+	if err != .None {
+		fmt.println("FAILED", err)
+	}
+
+	testing.expect_value(t, err, parser.ParseErr.None)
 
 	ast.prettyPrint(tree)
 }
