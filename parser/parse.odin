@@ -15,9 +15,13 @@ parse :: proc(tokens: [dynamic]tk.Token) -> (n: ast.Node, err: ParseErr) {
 	exprs := make([dynamic]ast.Node)
 
 	for !eof(ps) {
-		ex := parse_expression(ps) or_return
+		expr := parse_expression(ps) or_return
 
-		append(&exprs, ex)
+		if !eof(ps) {
+			expr = parse_quantifier(ps, expr) or_return
+		}
+
+		append(&exprs, expr)
 	}
 
 	switch len(exprs) {
@@ -44,10 +48,6 @@ parse_expression :: proc(ps: ^ParseState) -> (res: ast.Node, err: ParseErr) {
 	}
 
 	if res = parse_match(ps) or_return; res != nil {
-		return
-	}
-
-	if res = parse_quantifier(ps) or_return; res != nil {
 		return
 	}
 
@@ -194,6 +194,22 @@ parse_match :: proc(ps: ^ParseState) -> (n: ast.Node, err: ParseErr) {
 	return cast(ast.Node)ast.create_concatenation_from_ptr(concat[:]), .None
 }
 
-parse_quantifier :: proc() {
+parse_quantifier :: proc(ps: ^ParseState, previous: ast.Node) -> (n: ast.Node, err: ParseErr) {
+	if previous == nil {
+		return nil, .Invalid
+	}
 
+	if matches(ps, .Plus) {
+		return ast.create_atleastonce(previous), nil
+	}
+
+	if matches(ps, .Star) {
+		return ast.create_howevermany(previous), nil
+	}
+
+	if matches(ps, .Q) {
+		return ast.create_optional(previous), nil
+	}
+
+	return previous, .None
 }
