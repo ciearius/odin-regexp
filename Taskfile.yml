@@ -1,11 +1,15 @@
 version: '3'
 # https://taskfile.dev
 
+shopt: [globstar]
+
 vars:
   GREETING: Hello, World!
 
 tasks:
   test-file:
     desc: "Run all tests in a single odin file."
+    sources:
+      - ./**/*.odin
     cmds:
       - odin test {{.CLI_ARGS}} -file

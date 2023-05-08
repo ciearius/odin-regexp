@@ -3,23 +3,6 @@ package vm
 import "../ast"
 import "core:slice"
 
-/*
-- ^Group,
-
-// Matching
-- ^Match_Range,
-- ^Match_Set,
-
-// Collections
-- ^Concatenation,
-- ^Alternation,
-
-// Quantifier
-- ^Optional,
-- ^Howevermany,
-- ^Atleastonce,
-*/
-
 code_from :: proc(c: ^ConstBuilder, node: ast.Node) -> Snippet {
 
 	switch in node {
@@ -118,10 +101,7 @@ code_from_alternation :: proc(c: ^ConstBuilder, node: ^ast.Alternation) -> Snipp
 		head[idx] = code(.SPLIT, Param_Split{o0[idx] + idxO0, 1})
 	}
 
-	r := [2]Snippet{
-		head,
-		slice.concatenate(blocks[:])
-	}
+	r := [2]Snippet{head, slice.concatenate(blocks[:])}
 
 	return slice.concatenate(r[:])
 }

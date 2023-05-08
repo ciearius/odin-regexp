@@ -24,5 +24,4 @@ test_vm :: proc(t: ^testing.T) {
 
 	code := vm.code_from(cb, tree)
 
-	vm.display_code(code)
 }
