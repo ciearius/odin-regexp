@@ -2,7 +2,9 @@ FROM ubuntu
 
 # install requirements
 RUN apt update &&\
- apt install -y bash make git llvm-14-dev clang-14
+ apt install -y bash make git llvm-14-dev clang-14 nodejs npm
+
+RUN npm i -g @go-task/cli
 
 # paths for building odin
 ENV LLVM_CONFIG="/usr/bin/llvm-config-14"
