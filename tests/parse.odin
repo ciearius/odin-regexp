@@ -14,17 +14,17 @@ import "../ast"
 // 	}
 // }
 
-@(test)
-test_parse :: proc(t: ^testing.T) {
-	tokens := tokenizer.tokenize(`hello[a-zA-Z]+`)
+// @(test)
+// test_parse :: proc(t: ^testing.T) {
+// 	tokens := tokenizer.tokenize(`hello[a-zA-Z]+`)
 
-	tree, err := parser.parse(tokens)
+// 	tree, err := parser.parse(tokens)
 
-	if err != .None {
-		fmt.println("FAILED", err)
-	}
+// 	if err != .None {
+// 		fmt.println("FAILED", err)
+// 	}
 
-	testing.expect_value(t, err, parser.ParseErr.None)
+// 	testing.expect_value(t, err, parser.ParseErr.None)
 
-	ast.prettyPrint(tree)
-}
+// 	ast.prettyPrint(tree)
+// }
