@@ -1,3 +1,9 @@
 # Binaries
 *.bin
 *.exe
+
+libs/*
+!libs/README.md
+
+# Taskfile related
+.task
