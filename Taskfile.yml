@@ -7,6 +7,7 @@ tasks:
   init-dependencies:
     desc: "Download and (if necessary) build all dependencies."
     cmds:
+      - task: pull-odin
       - task: init-odin-linux
       - task: init-odin-windows
 
@@ -17,12 +18,11 @@ tasks:
     generates:
       - "compiler"
     status:
-      - "git tag"
+      - "test -f compiler/README.md"
 
   init-odin-linux:
     desc: "Setup the Odin language compiler"
     platforms: ["linux"]
-    deps: [pull-odin]
     internal: true
     dir: ./libs/compiler
     env:
@@ -36,7 +36,6 @@ tasks:
   init-odin-windows:
     desc: "Setup the Odin language compiler"
     platforms: ["windows"]
-    deps: [pull-odin]
     internal: true
     dir: ./libs/compiler
     vars:
