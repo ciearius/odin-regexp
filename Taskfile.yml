@@ -3,10 +3,51 @@ version: '3'
 
 shopt: [globstar]
 
-vars:
-  GREETING: Hello, World!
-
 tasks:
+  init-dependencies:
+    desc: "Download and (if necessary) build all dependencies."
+    cmds:
+      - task: init-odin-linux
+      - task: init-odin-windows
+
+  pull-odin:
+    dir: ./libs
+    cmds:
+      - git clone --depth=1 https://github.com/odin-lang/Odin.git compiler
+    generates:
+      - "compiler"
+    status:
+      - "git tag"
+
+  init-odin-linux:
+    desc: "Setup the Odin language compiler"
+    platforms: ["linux"]
+    deps: [pull-odin]
+    internal: true
+    dir: ./libs/compiler
+    env:
+      LLVM_CONFIG: /usr/bin/llvm-config-14
+      CXX: /usr/lib/llvm-14/bin/clang
+    cmds:
+      - ./build_odin.sh release
+    generates:
+      - "Odin.bin"
+
+  init-odin-windows:
+    desc: "Setup the Odin language compiler"
+    platforms: ["windows"]
+    deps: [pull-odin]
+    internal: true
+    dir: ./libs/compiler
+    vars:
+      CMD_INIT_VS: "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Auxiliary\\Build\\vcvarsall.bat\" x64"
+      CMD_SHELL_VS: "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\Common7\\Tools\\VsDevCmd.bat\""
+    cmds:
+      # - "{{.CMD_INIT_VS}} && {{.CMD_SHELL_VS}} /k build.bat"
+      - "'C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Auxiliary\\Build\\vcvarsall.bat' x64; build.bat"
+    generates:
+      - "Odin.exe"
+
   test-file:
     desc: "Run all tests in a single odin file."
     sources:
