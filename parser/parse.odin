@@ -180,18 +180,18 @@ parse_set :: proc(ps: ^ParseState) -> (n: ast.Node, err: ParseErr) {
 
 parse_match :: proc(ps: ^ParseState) -> (n: ast.Node, err: ParseErr) {
 
-	concat := make([dynamic]^ast.Node)
+	concat := make([dynamic]ast.Node)
 
 	if ps.curr.ttype == .Alphanumeric {
 		for r in ps.curr.value {
 			m := ast.create_match_set(ps.curr.value)
-			append(&concat, cast(^ast.Node)m)
+			append(&concat, m)
 		}
 	}
 
 	advance(ps)
 
-	return cast(ast.Node)ast.create_concatenation_from_ptr(concat[:]), .None
+	return ast.create_concatenation(concat[:]), .None
 }
 
 parse_quantifier :: proc(ps: ^ParseState, previous: ast.Node) -> (n: ast.Node, err: ParseErr) {

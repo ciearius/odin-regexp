@@ -94,11 +94,12 @@ code_from_alternation :: proc(c: ^ConstBuilder, node: ^ast.Alternation) -> Snipp
 		idxO0 = hSize - idx
 
 		if idx == bCount - 2 {
-			head[idx] = code(.SPLIT, Param_Split{o0[idx] + idxO0, o0[idx + 1] + idxO0})
+			head[idx] = code(.SPLIT, create_param_split(o0[idx] + idxO0, o0[idx + 1] + idxO0))
 			break
 		}
 
-		head[idx] = code(.SPLIT, Param_Split{o0[idx] + idxO0, 1})
+		head[idx] = code(.SPLIT, create_param_split(o0[idx] + idxO0, 1))
+		idx+=1
 	}
 
 	r := [2]Snippet{head, slice.concatenate(blocks[:])}

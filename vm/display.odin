@@ -17,30 +17,28 @@ code_to_string :: proc(s: Snippet) -> string {
 			idx,
 			instr.code,
 			instr.code,
-			to_string(instr.args),
+			to_string(instr.code, instr.args),
 		)
 	}
 
 	return res
 }
 
-argument_to_string :: proc(arg: Argument) -> string {
-	switch in arg {
+argument_to_string :: proc(code: OpCode, arg: Argument) -> string {
+	switch code {
 
-	case ^Param_Char:
-		p := arg.(^Param_Char)
-		return fmt.aprintf("%v%v", (p.negated ? "not " : ""), p.r)
-	case ^Param_Range:
-		p := arg.(^Param_Range)
-		return fmt.aprintf("%v%v - %v", (p.negated ? "not " : ""), p.r[0], p.r[1])
-	case ^Param_Set:
-		p := arg.(^Param_Set)
-		return fmt.aprintf("%vin set # %v", (p.negated ? "not " : ""), p.id)
-	case Param_Split:
-		p := arg.(Param_Split)
-		return fmt.aprintf("move %v move %v", p[0], p[1])
-	case Param_Jump:
-		return fmt.aprintf("move %v", arg.(Param_Jump))
+	case .CHAR:
+		return fmt.aprintf("%v%v", (arg.negated ? "not " : ""), arg.char)
+	case .RANGE:
+		return fmt.aprintf("%v%v - %v", (arg.negated ? "not " : ""), arg.range[0], arg.range[1])
+	case .SET:
+		return fmt.aprintf("%vin set # %v", (arg.negated ? "not " : ""), arg.idx)
+	case .SPLIT:
+		return fmt.aprintf("move %v move %v", arg.split[0], arg.split[1])
+	case .JUMP:
+		return fmt.aprintf("move %v", arg.idx)
+	case .MATCH:
+		return ""
 	}
 
 	panic(fmt.aprintf("%T %v", arg, arg))
