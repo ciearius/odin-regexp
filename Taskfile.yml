@@ -4,6 +4,16 @@ version: '3'
 shopt: [globstar]
 
 tasks:
+  build-speed:
+    desc: "Build main.odin with speed optimization."
+    cmds:
+      - "odin build . -o:speed -out=oregexp{{exeExt}}"
+    
+  build:
+    desc: "Build main.odin with no optimization."
+    cmds:
+      - "odin build . -o:none -out=oregexp{{exeExt}}"
+
   init-dependencies:
     desc: "Download and (if necessary) build all dependencies."
     cmds:

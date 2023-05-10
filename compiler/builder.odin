@@ -11,12 +11,6 @@ ConstBuilder :: struct {
 	sets: [dynamic]Charset,
 }
 
-collect :: proc(i: []^bytecode.Instruction) -> Snippet {
-	s := make(Snippet, len(i))
-	s = i
-	return s
-}
-
 add :: proc {
 	add_charset,
 }
@@ -46,21 +40,4 @@ init_builder :: proc() -> ^ConstBuilder {
 	c.sets = make([dynamic]Charset)
 
 	return c
-}
-
-to_program :: proc(c: ^ConstBuilder, code: Snippet) -> ^Program {
-	p := new(Program)
-
-	p.const = to_const(c)
-	p.code = code
-
-	return p
-}
-
-to_const :: proc(c: ^ConstBuilder) -> ^Constants {
-	const := new(Constants)
-
-	const.sets = c.sets[:]
-
-	return const
 }

@@ -1,6 +1,5 @@
 package vm
 
-import "core:fmt"
 import "core:slice"
 
 import "../bytecode"
@@ -9,11 +8,16 @@ import "../compiler"
 run :: proc(prog: ^compiler.Program, input: []rune) -> bool {
 	m := create_vm(prog, create_context(input))
 
-	for m.ctx != nil {
-		instr := m.program.code[m.ctx.ip]
-		crune := m.ctx.input[m.ctx.sp]
+	for !m.failed {
+		crune: rune
+		instr: bytecode.Instruction
 
-		fmt.println(crune, bytecode.to_string(instr))
+		if len(m.ctx.input) > m.ctx.sp {
+			crune = m.ctx.input[m.ctx.sp]
+		}
+		if len(m.program.code) > m.ctx.ip {
+			instr = m.program.code[m.ctx.ip]
+		}
 
 		#partial switch instr.code {
 
@@ -32,6 +36,7 @@ run :: proc(prog: ^compiler.Program, input: []rune) -> bool {
 		case .SET:
 			if _, ok := slice.binary_search(m.program.const.sets[instr.idx], crune); ok {
 				m.ctx.ip += 1
+				m.ctx.sp += 1
 				continue
 			}
 
@@ -41,6 +46,7 @@ run :: proc(prog: ^compiler.Program, input: []rune) -> bool {
 		case .RANGE:
 			if instr.range[0] <= crune && crune <= instr.range[1] {
 				m.ctx.ip += 1
+				m.ctx.sp += 1
 				continue
 			}
 
@@ -50,6 +56,7 @@ run :: proc(prog: ^compiler.Program, input: []rune) -> bool {
 		case .CHAR:
 			if instr.char == crune {
 				m.ctx.ip += 1
+				m.ctx.sp += 1
 				continue
 			}
 

@@ -3,6 +3,7 @@ package vm
 import "../compiler"
 
 VM :: struct {
+	failed:  bool,
 	program: ^compiler.Program,
 	ctx:     ^ExecutionContext,
 	stack:   [dynamic]^ExecutionContext,
@@ -10,11 +11,13 @@ VM :: struct {
 
 vm_fail_context :: proc(m: ^VM) {
 	if len(m.stack) > 0 {
+		free(m.ctx)
 		m.ctx = pop(&m.stack)
 		return
 	}
 
 	m.ctx = nil
+	m.failed = true
 }
 
 vm_push_context :: proc(m: ^VM, ctx: ^ExecutionContext) {
@@ -40,8 +43,8 @@ split_context :: proc(ctx: ^ExecutionContext, rel_ip, rel_sp: int) -> ^Execution
 	nctx := new(ExecutionContext)
 
 	nctx.input = ctx.input
-	nctx.ip += rel_ip
-	nctx.sp += rel_sp
+	nctx.ip = ctx.ip + rel_ip
+	nctx.sp = ctx.sp + rel_sp
 
 	return nctx
 }
