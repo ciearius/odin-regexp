@@ -8,11 +8,11 @@ to_string :: proc {
 	code_to_string,
 }
 
-instr_to_string :: proc(instr: ^Instruction) -> string {
+instr_to_string :: proc(instr: Instruction) -> string {
 	return fmt.aprintf("%i: %s \t {{ %v }}", instr.code, instr.code, to_string(instr.code, instr))
 }
 
-code_to_string :: proc(s: []^Instruction) -> string {
+code_to_string :: proc(s: []Instruction) -> string {
 	res := ""
 
 	for instr, idx in s {
@@ -22,7 +22,7 @@ code_to_string :: proc(s: []^Instruction) -> string {
 	return res
 }
 
-argument_to_string :: proc(code: OpCode, instr: ^Instruction) -> string {
+argument_to_string :: proc(code: OpCode, instr: Instruction) -> string {
 	switch code {
 
 	case .CHAR:

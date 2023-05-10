@@ -13,23 +13,16 @@ Constants :: struct {
 	sets: []Charset,
 }
 
-to_const :: proc(c: ^ConstBuilder) -> ^Constants {
-	const := new(Constants)
-
-	const.sets = c.sets[:]
-
-	return const
+to_const :: proc(c: ^ConstBuilder) -> []Charset {
+	return c.sets[:]
 }
 
-to_program :: proc(c: ^ConstBuilder, code: Snippet) -> ^Program {
-	p := new(Program)
-
-	p.const = to_const(c)
-	p.code = make([]bytecode.Instruction, len(code))
+to_code :: proc(c: ^ConstBuilder, code: Snippet) -> []bytecode.Instruction {
+	res := make([]bytecode.Instruction, len(code))
 
 	for instr, i in code {
-		p.code[i] = instr^
+		res[i] = instr^
 	}
 
-	return p
+	return res
 }

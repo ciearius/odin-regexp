@@ -14,7 +14,9 @@ import "./bytecode"
 import "./util"
 
 main :: proc() {
-	stress(24)
+	for i in 1 ..= 30 {
+		stress(i)
+	}
 }
 
 stress :: proc(n: int) {
@@ -29,7 +31,7 @@ stress :: proc(n: int) {
 		fmt.println("Failed to parse tokens...")
 	}
 
-	prog := compiler.compile(tree)
+	const, code := compiler.compile(tree)
 
 	input := make([]rune, n)
 
@@ -38,11 +40,23 @@ stress :: proc(n: int) {
 	fmt.println("using n =", n)
 	sw := time.now()
 
-	r0 := vm.run(prog, input)
+	r0 := vm.run(code, const, input)
 
 	fmt.println("took", time.duration_milliseconds(time.since(sw)), "ms")
 
 	if r0 {
+		fmt.println("match found!")
+	} else {
+		fmt.println("no match was found")
+	}
+
+	input[n - 1] = 'c'
+
+	r1 := vm.run(code, const, input)
+
+	fmt.println("took", time.duration_milliseconds(time.since(sw)), "ms")
+
+	if r1 {
 		fmt.println("match found!")
 	} else {
 		fmt.println("no match was found")

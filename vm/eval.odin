@@ -2,67 +2,77 @@ package vm
 
 import "core:slice"
 
-import "../bytecode"
-import "../compiler"
+import b "../bytecode"
+import c "../compiler"
 
-run :: proc(prog: ^compiler.Program, input: []rune) -> bool {
-	m := create_vm(prog, create_context(input))
+run :: proc(code: []b.Instruction, sets: []c.Charset, input: []rune) -> bool #no_bounds_check {
+	stack := make([dynamic]ExecutionContext, 0, len(code))
 
-	for !m.failed {
-		crune: rune
-		instr: bytecode.Instruction
+	ctx := ExecutionContext {
+		ip = 0,
+		sp = 0,
+	}
 
-		if len(m.ctx.input) > m.ctx.sp {
-			crune = m.ctx.input[m.ctx.sp]
+	crune: rune
+	instr: b.Instruction
+
+	for !ctx.failed {
+		crune = 0
+		instr = {}
+
+		if len(input) > ctx.sp {
+			crune = input[ctx.sp]
 		}
-		if len(m.program.code) > m.ctx.ip {
-			instr = m.program.code[m.ctx.ip]
+		if len(code) > ctx.ip {
+			instr = code[ctx.ip]
 		}
 
-		#partial switch instr.code {
-
-		case .JUMP:
-			m.ctx.ip += instr.idx
+		if .JUMP == instr.code {
+			ctx.ip += instr.idx
 			continue
+		}
 
-		case .CHAR:
+		if .SPLIT == instr.code {
+			append(&stack, split_context(&ctx, instr.split[1], 0))
+			ctx.ip += instr.split[0]
+			continue
+		}
+
+		if .CHAR == instr.code {
 			if instr.char == crune {
-				m.ctx.ip += 1
-				m.ctx.sp += 1
+				ctx.ip += 1
+				ctx.sp += 1
 				continue
 			}
 
-			vm_fail_context(m)
+			ctx = next_context(&stack)
 			continue
+		}
 
-		case .SPLIT:
-			vm_push_context(m, split_context(m.ctx, instr.split[1], 0))
-			m.ctx.ip += instr.split[0]
-			continue
-
-		case .SET:
-			if _, ok := slice.binary_search(m.program.const.sets[instr.idx], crune); ok {
-				m.ctx.ip += 1
-				m.ctx.sp += 1
+		if .SET == instr.code {
+			if _, ok := slice.binary_search(sets[instr.idx], crune); ok {
+				ctx.ip += 1
+				ctx.sp += 1
 				continue
 			}
 
-			vm_fail_context(m)
+			ctx = next_context(&stack)
 			continue
+		}
 
-		case .RANGE:
+		if .RANGE == instr.code {
 			if instr.range[0] <= crune && crune <= instr.range[1] {
-				m.ctx.ip += 1
-				m.ctx.sp += 1
+				ctx.ip += 1
+				ctx.sp += 1
 				continue
 			}
 
-			vm_fail_context(m)
+			ctx = next_context(&stack)
 			continue
+		}
 
-		case .MATCH:
+		if .MATCH == instr.code {
 			return true
-
 		}
 
 		break

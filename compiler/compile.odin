@@ -5,14 +5,12 @@ import "core:slice"
 import "../bytecode"
 import "../ast"
 
-compile :: proc(tree: ast.Node) -> ^Program {
+compile :: proc(tree: ast.Node) -> ([]Charset, []bytecode.Instruction) {
 	cb := init_builder()
 
-	code := code_from(cb, tree)
+	code := to_code(cb, append_instr(code_from(cb, tree), bytecode.instr_match()))
 
-	prog := to_program(cb, append_instr(code, bytecode.instr_match()))
-
-	return prog
+	return to_const(cb), code
 }
 
 create_snippet :: proc(ii: ..^bytecode.Instruction) -> Snippet {
