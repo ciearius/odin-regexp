@@ -10,7 +10,8 @@
 		"vscode": {
 			"extensions": [
 				"DanielGavin.ols",
-				"bierner.markdown-mermaid"
+				"bierner.markdown-mermaid",
+				"task.vscode-task"
 			]
 		}
 	}

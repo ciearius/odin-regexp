@@ -11,7 +11,7 @@ VM :: struct {
 
 vm_fail_context :: proc(m: ^VM) {
 	if len(m.stack) > 0 {
-		free(m.ctx)
+		destroy_context(m.ctx)
 		m.ctx = pop(&m.stack)
 		return
 	}
@@ -57,4 +57,8 @@ create_context :: proc(input: []rune) -> ^ExecutionContext {
 	ctx.sp = 0
 
 	return ctx
+}
+
+destroy_context :: proc(ctx: ^ExecutionContext) {
+	free(ctx)
 }

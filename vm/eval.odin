@@ -21,16 +21,23 @@ run :: proc(prog: ^compiler.Program, input: []rune) -> bool {
 
 		#partial switch instr.code {
 
-		case .MATCH:
-			return true
+		case .JUMP:
+			m.ctx.ip += instr.idx
+			continue
+
+		case .CHAR:
+			if instr.char == crune {
+				m.ctx.ip += 1
+				m.ctx.sp += 1
+				continue
+			}
+
+			vm_fail_context(m)
+			continue
 
 		case .SPLIT:
 			vm_push_context(m, split_context(m.ctx, instr.split[1], 0))
 			m.ctx.ip += instr.split[0]
-			continue
-
-		case .JUMP:
-			m.ctx.ip += instr.idx
 			continue
 
 		case .SET:
@@ -53,15 +60,8 @@ run :: proc(prog: ^compiler.Program, input: []rune) -> bool {
 			vm_fail_context(m)
 			continue
 
-		case .CHAR:
-			if instr.char == crune {
-				m.ctx.ip += 1
-				m.ctx.sp += 1
-				continue
-			}
-
-			vm_fail_context(m)
-			continue
+		case .MATCH:
+			return true
 
 		}
 
