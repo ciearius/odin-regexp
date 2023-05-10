@@ -2,7 +2,9 @@ FROM ubuntu
 
 # install requirements
 RUN apt update &&\
- apt install -y bash make git llvm-14-dev clang-14 nodejs npm
+ apt install -y bash make git llvm-14-dev clang-14 nodejs npm build-essential flex bison libssl-dev libelf-dev
+
+RUN sysctl -w kernel.perf_event_paranoid=1
 
 RUN npm i -g @go-task/cli
 

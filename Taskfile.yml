@@ -63,3 +63,16 @@ tasks:
       - ./**/*.odin
     cmds:
       - odin test {{.CLI_ARGS}} -file
+
+  pull-perf:
+    dir: ./libs
+    cmds:
+      - git clone --depth=1 https://github.com/microsoft/WSL2-Linux-Kernel.git perf
+    generates:
+      - perf/README.md
+
+  init-perf:
+    dir: ./libs/perf/tools/perf
+    deps: [pull-perf]
+    cmds:
+      - make
