@@ -1,7 +1,9 @@
 package vm
 
+import "../compiler"
+
 VM :: struct {
-	program: ^Program,
+	program: ^compiler.Program,
 	ctx:     ^ExecutionContext,
 	stack:   [dynamic]^ExecutionContext,
 }
@@ -24,7 +26,7 @@ ExecutionContext :: struct {
 	ip, sp: int,
 }
 
-create_vm :: proc(program: ^Program, initial_context: ^ExecutionContext) -> ^VM {
+create_vm :: proc(program: ^compiler.Program, initial_context: ^ExecutionContext) -> ^VM {
 	mvm := new(VM)
 
 	mvm.program = program

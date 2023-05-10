@@ -1,12 +1,17 @@
-package vm
+package compiler
 
 import "core:slice"
+
+import "../bytecode"
+
+Snippet :: []^bytecode.Instruction
+Charset :: []rune
 
 ConstBuilder :: struct {
 	sets: [dynamic]Charset,
 }
 
-collect :: proc(i: []^Instruction) -> Snippet {
+collect :: proc(i: []^bytecode.Instruction) -> Snippet {
 	s := make(Snippet, len(i))
 	s = i
 	return s

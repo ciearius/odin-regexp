@@ -1,17 +1,18 @@
-package vm
+package bytecode
 
 import "core:fmt"
 
 to_string :: proc {
-	code_to_string,
 	argument_to_string,
+	instr_to_string,
+	code_to_string,
 }
 
 instr_to_string :: proc(instr: ^Instruction) -> string {
 	return fmt.aprintf("%i: %s \t {{ %v }}", instr.code, instr.code, to_string(instr.code, instr))
 }
 
-code_to_string :: proc(s: Snippet) -> string {
+code_to_string :: proc(s: []^Instruction) -> string {
 	res := ""
 
 	for instr, idx in s {

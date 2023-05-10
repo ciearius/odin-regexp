@@ -1,4 +1,4 @@
-package vm
+package bytecode
 
 Instruction :: struct {
 	code:    OpCode,
@@ -11,7 +11,7 @@ Instruction :: struct {
 	split:   [2]int,
 }
 
-create_instr_char :: proc(r: rune, negated: bool) -> ^Instruction {
+instr_char :: proc(r: rune, negated: bool) -> ^Instruction {
 	a := new(Instruction)
 
 	a.code = .CHAR
@@ -21,7 +21,7 @@ create_instr_char :: proc(r: rune, negated: bool) -> ^Instruction {
 	return a
 }
 
-create_instr_set :: proc(id: int, negated: bool) -> ^Instruction {
+instr_set :: proc(id: int, negated: bool) -> ^Instruction {
 	a := new(Instruction)
 
 	a.code = .SET
@@ -31,7 +31,7 @@ create_instr_set :: proc(id: int, negated: bool) -> ^Instruction {
 	return a
 }
 
-create_instr_range :: proc(r0, r1: rune, negated: bool) -> ^Instruction {
+instr_range :: proc(r0, r1: rune, negated: bool) -> ^Instruction {
 	a := new(Instruction)
 
 	a.code = .RANGE
@@ -41,7 +41,7 @@ create_instr_range :: proc(r0, r1: rune, negated: bool) -> ^Instruction {
 	return a
 }
 
-create_instr_split :: proc(pc1, pc2: int) -> ^Instruction {
+instr_split :: proc(pc1, pc2: int) -> ^Instruction {
 	a := new(Instruction)
 
 	a.code = .SPLIT
@@ -50,7 +50,7 @@ create_instr_split :: proc(pc1, pc2: int) -> ^Instruction {
 	return a
 }
 
-create_instr_match :: proc() -> ^Instruction {
+instr_match :: proc() -> ^Instruction {
 	a := new(Instruction)
 
 	a.code = .MATCH
@@ -58,21 +58,11 @@ create_instr_match :: proc() -> ^Instruction {
 	return a
 }
 
-create_instr_jump :: proc(rel: int) -> ^Instruction {
+instr_jump :: proc(rel: int) -> ^Instruction {
 	a := new(Instruction)
 
 	a.code = .JUMP
 	a.idx = rel
 
 	return a
-}
-
-create_snippet :: proc(ii: ..^Instruction) -> Snippet {
-	s := make([]^Instruction, len(ii))
-
-	for i, idx in ii {
-		s[idx] = i
-	}
-
-	return s
 }

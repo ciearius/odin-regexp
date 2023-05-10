@@ -1,12 +1,11 @@
-package vm
+package compiler
 
 import "core:slice"
 
-Snippet :: []^Instruction
-Charset :: []rune
+import "../bytecode"
 
 Program :: struct {
-	code:  []^Instruction,
+	code:  []^bytecode.Instruction,
 	const: ^Constants,
 }
 

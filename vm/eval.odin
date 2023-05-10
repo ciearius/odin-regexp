@@ -3,14 +3,17 @@ package vm
 import "core:fmt"
 import "core:slice"
 
-run :: proc(prog: ^Program, input: []rune) -> bool {
+import "../bytecode"
+import "../compiler"
+
+run :: proc(prog: ^compiler.Program, input: []rune) -> bool {
 	m := create_vm(prog, create_context(input))
 
 	for m.ctx != nil {
 		instr := m.program.code[m.ctx.ip]
 		crune := m.ctx.input[m.ctx.sp]
 
-		fmt.println(crune, instr_to_string(instr))
+		fmt.println(crune, bytecode.to_string(instr))
 
 		#partial switch instr.code {
 

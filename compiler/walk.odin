@@ -1,6 +1,8 @@
-package vm
+package compiler
 
 import "../ast"
+import "../bytecode"
+
 import "core:slice"
 
 code_from :: proc(c: ^ConstBuilder, node: ast.Node) -> Snippet {
@@ -41,19 +43,19 @@ code_from_group :: proc(c: ^ConstBuilder, node: ^ast.Group) -> Snippet {
 }
 
 code_from_match_range :: proc(c: ^ConstBuilder, node: ^ast.Match_Range) -> Snippet {
-	return create_snippet(create_instr_range(node.range[0], node.range[1], node.negated))
+	return create_snippet(bytecode.instr_range(node.range[0], node.range[1], node.negated))
 }
 
 code_from_match_set :: proc(c: ^ConstBuilder, node: ^ast.Match_Set) -> Snippet {
 	if len(node.cset) == 1 {
-		return create_snippet(create_instr_char(node.cset[0], node.negated))
+		return create_snippet(bytecode.instr_char(node.cset[0], node.negated))
 	}
 
-	return create_snippet(create_instr_set(add(c, node.cset), node.negated))
+	return create_snippet(bytecode.instr_set(add(c, node.cset), node.negated))
 }
 
 code_from_concatenation :: proc(c: ^ConstBuilder, node: ^ast.Concatenation) -> Snippet {
-	gen := make([dynamic]^Instruction)
+	gen := make([dynamic]^bytecode.Instruction)
 
 	for n in node.nodes {
 		append(&gen, ..code_from(c, n))
@@ -78,7 +80,7 @@ code_from_alternation :: proc(cb: ^ConstBuilder, node: ^ast.Alternation) -> Snip
 
 	for block, blockIdx in node.nodes {
 		codeBlock := code_from(cb, block)
-		jmpEnd := create_instr_jump(-1)
+		jmpEnd := bytecode.instr_jump(-1)
 
 		if blockIdx == lastIdx {
 			blocks[blockIdx] = codeBlock
@@ -111,7 +113,7 @@ code_from_alternation :: proc(cb: ^ConstBuilder, node: ^ast.Alternation) -> Snip
 		lineOffset := headerSize - 1 - lineIdx
 
 		if lineIdx == blockCount - 2 {
-			head[lineIdx] = create_instr_split(
+			head[lineIdx] = bytecode.instr_split(
 				offset[lineIdx] + lineOffset,
 				offset[lineIdx + 1] + lineOffset,
 			)
@@ -119,7 +121,7 @@ code_from_alternation :: proc(cb: ^ConstBuilder, node: ^ast.Alternation) -> Snip
 			break
 		}
 
-		head[lineIdx] = create_instr_split(offset[lineIdx] + lineOffset, 1)
+		head[lineIdx] = bytecode.instr_split(offset[lineIdx] + lineOffset, 1)
 		lineIdx += 1
 	}
 
