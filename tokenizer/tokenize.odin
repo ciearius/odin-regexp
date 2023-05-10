@@ -71,8 +71,7 @@ tokenize :: proc(s: string) -> (res: [dynamic]Token) {
 		panic(fmt.aprintf("failed %r ", c))
 	}
 
-
-	append(&ts.res, Token{ttype = .EOF})
+	append(&ts.res, create_token(.EOF, []rune{}, Pos{}))
 
 	return ts.res
 }

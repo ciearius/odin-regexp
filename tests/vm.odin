@@ -2,6 +2,8 @@ package tests
 
 import "core:testing"
 import "core:fmt"
+import "core:slice"
+
 
 import "../tokenizer"
 import "../parser"
@@ -22,6 +24,16 @@ test_vm :: proc(t: ^testing.T) {
 
 	cb := vm.init_builder()
 
-	code := vm.code_from(cb, tree)
+	ast.prettyPrint(tree)
 
+	code := vm.code_from(cb, tree)
+	code = slice.concatenate([]vm.Snippet{code, {vm.create_instr_match()}})
+
+	fmt.println(vm.to_string(code))
+
+	prog := vm.to_program(cb, code)
+
+	r := vm.run(prog, []rune{'a', 'A'})
+
+	fmt.println(r)
 }

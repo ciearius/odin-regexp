@@ -6,7 +6,7 @@ ConstBuilder :: struct {
 	sets: [dynamic]Charset,
 }
 
-collect :: proc(i: []Instruction) -> Snippet {
+collect :: proc(i: []^Instruction) -> Snippet {
 	s := make(Snippet, len(i))
 	s = i
 	return s
@@ -43,12 +43,11 @@ init_builder :: proc() -> ^ConstBuilder {
 	return c
 }
 
-to_program :: proc(c: ^ConstBuilder, code: []Instruction) -> ^Program {
+to_program :: proc(c: ^ConstBuilder, code: Snippet) -> ^Program {
 	p := new(Program)
 
-	defer free(c)
-
 	p.const = to_const(c)
+	p.code = code
 
 	return p
 }
@@ -57,8 +56,6 @@ to_const :: proc(c: ^ConstBuilder) -> ^Constants {
 	const := new(Constants)
 
 	const.sets = c.sets[:]
-
-	free(c)
 
 	return const
 }

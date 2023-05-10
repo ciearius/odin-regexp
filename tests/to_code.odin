@@ -34,8 +34,8 @@ t_code_from_match_set :: proc(t: ^testing.T) {
 
 	expect_value(t, len(actual), 1)
 	expect_value(t, actual[0].code, vm.OpCode.SET)
-	expect_value(t, actual[0].args.idx, 0)
-	expect_value(t, actual[0].args.negated, true)
+	expect_value(t, actual[0].idx, 0)
+	expect_value(t, actual[0].negated, true)
 
 	expect_value(t, len(cb.sets), 1)
 	expect_value(t, len(cb.sets[0]), 3)
@@ -55,8 +55,8 @@ t_code_from_match_char :: proc(t: ^testing.T) {
 	expect_value(t, len(actual), 1)
 	expect_value(t, actual[0].code, vm.OpCode.CHAR)
 
-	expect_value(t, actual[0].args.char, 'a')
-	expect_value(t, actual[0].args.negated, true)
+	expect_value(t, actual[0].char, 'a')
+	expect_value(t, actual[0].negated, true)
 
 	expect_value(t, len(cb.sets), 0)
 }

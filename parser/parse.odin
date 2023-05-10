@@ -62,6 +62,11 @@ parse_alphanum :: proc(ps: ^ParseState) -> (n: ast.Node, err: ParseErr) {
 		}
 
 		advance(ps)
+
+		if len(m) == 1 {
+			return m[0], .None
+		}
+
 		return ast.create_concatenation(m[:]), .None
 	}
 
@@ -152,11 +157,14 @@ parse_set :: proc(ps: ^ParseState) -> (n: ast.Node, err: ParseErr) {
 		append(&res, match_set)
 	}
 
-	if len(ranges) > 0 {
+	if len(ranges) > 1 {
 		match_ranges := ast.create_alternation(ranges[:])
 		append(&res, match_ranges)
 	}
 
+	if len(ranges) == 1 {
+		append(&res, ranges[0])
+	}
 
 	if !matches(ps, .Close_Bracket) {
 		return nil, .UnterminatedSet

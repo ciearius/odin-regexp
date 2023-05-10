@@ -33,3 +33,11 @@ Token :: struct {
 	value:     []rune,
 	using pos: Pos,
 }
+
+create_token :: proc(t: TokenType, val: []rune, pos: Pos) -> Token {
+	n := new(Token)
+	n.ttype = t
+	n.value = val
+	n.pos = pos
+	return n^
+}

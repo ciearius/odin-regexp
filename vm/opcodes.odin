@@ -1,6 +1,8 @@
 package vm
 
 OpCode :: enum {
+	Err,
+
 	// matching
 	CHAR,
 	SET,

@@ -41,21 +41,19 @@ code_from_group :: proc(c: ^ConstBuilder, node: ^ast.Group) -> Snippet {
 }
 
 code_from_match_range :: proc(c: ^ConstBuilder, node: ^ast.Match_Range) -> Snippet {
-	return collect(
-		{code(.RANGE, create_param_range([2]rune{node.range[0], node.range[1]}, node.negated))},
-	)
+	return create_snippet(create_instr_range(node.range[0], node.range[1], node.negated))
 }
 
 code_from_match_set :: proc(c: ^ConstBuilder, node: ^ast.Match_Set) -> Snippet {
 	if len(node.cset) == 1 {
-		return collect({code(.CHAR, create_param_char(node.cset[0], node.negated))})
+		return create_snippet(create_instr_char(node.cset[0], node.negated))
 	}
 
-	return collect({code(.SET, create_param_set(add(c, node.cset), node.negated))})
+	return create_snippet(create_instr_set(add(c, node.cset), node.negated))
 }
 
 code_from_concatenation :: proc(c: ^ConstBuilder, node: ^ast.Concatenation) -> Snippet {
-	gen := make([dynamic]Instruction)
+	gen := make([dynamic]^Instruction)
 
 	for n in node.nodes {
 		append(&gen, ..code_from(c, n))
@@ -64,60 +62,78 @@ code_from_concatenation :: proc(c: ^ConstBuilder, node: ^ast.Concatenation) -> S
 	return gen[:]
 }
 
-code_from_alternation :: proc(c: ^ConstBuilder, node: ^ast.Alternation) -> Snippet {
-	bCount := len(node.nodes)
-	hSize := bCount - 1
+code_from_alternation :: proc(cb: ^ConstBuilder, node: ^ast.Alternation) -> Snippet {
+	blockCount := len(node.nodes)
+	headerSize := blockCount - 1
 
-	if bCount < 2 {
+	if blockCount < 2 {
 		panic("cant alternate a single path")
 	}
 
-	o0 := make([]int, bCount)
-	blocks := make([dynamic]Snippet, bCount)
+	offset := make([]int, blockCount)
+	blocks := make([]Snippet, blockCount)
 
-	idx := 0
 	sum := 0
+	lastIdx := len(blocks) - 1
 
-	for idx < bCount {
-		blocks[idx] = code_from(c, node.nodes[idx])
-		o0[idx] = hSize + sum
+	for block, blockIdx in node.nodes {
+		codeBlock := code_from(cb, block)
+		jmpEnd := create_instr_jump(-1)
 
-		sum += len(blocks[idx])
-		idx += 1
+		if blockIdx == lastIdx {
+			blocks[blockIdx] = codeBlock
+		} else {
+			blocks[blockIdx] = slice.concatenate([]Snippet{codeBlock, {jmpEnd}})
+		}
+
+		offset[blockIdx] = headerSize + sum
+
+		sum += len(blocks[blockIdx])
 	}
 
+	sum = 1
 
-	head := make(Snippet, hSize)
+	for rev := lastIdx; rev >= 0; rev -= 1 {
+		if rev != lastIdx {
+			// jmp instr
+			blocks[rev][len(blocks[rev]) - 1].idx = sum
+			continue
+		}
 
-	idx = 0
-	idxO0 := hSize
+		sum += len(blocks[rev])
+	}
 
-	for idx < bCount {
-		idxO0 = hSize - idx
+	head := make(Snippet, headerSize)
 
-		if idx == bCount - 2 {
-			head[idx] = code(.SPLIT, create_param_split(o0[idx] + idxO0, o0[idx + 1] + idxO0))
+	lineIdx := 0
+
+	for lineIdx < blockCount {
+		lineOffset := headerSize - 1 - lineIdx
+
+		if lineIdx == blockCount - 2 {
+			head[lineIdx] = create_instr_split(
+				offset[lineIdx] + lineOffset,
+				offset[lineIdx + 1] + lineOffset,
+			)
+
 			break
 		}
 
-		head[idx] = code(.SPLIT, create_param_split(o0[idx] + idxO0, 1))
-		idx += 1
+		head[lineIdx] = create_instr_split(offset[lineIdx] + lineOffset, 1)
+		lineIdx += 1
 	}
 
-	r := [2]Snippet{head, slice.concatenate(blocks[:])}
-
-	return slice.concatenate(r[:])
+	return slice.concatenate([]Snippet{head, slice.concatenate(blocks[:])})
 }
 
 code_from_optional :: proc(c: ^ConstBuilder, node: ^ast.Optional) -> Snippet {
-	// TODO: addressing pc?
-	return nil
+	panic("not implemented")
 }
 
 code_from_howevermany :: proc(c: ^ConstBuilder, node: ^ast.Howevermany) -> Snippet {
-	return nil
+	panic("not implemented")
 }
 
 code_from_atleastonce :: proc(c: ^ConstBuilder, node: ^ast.Atleastonce) -> Snippet {
-	return nil
+	panic("not implemented")
 }
