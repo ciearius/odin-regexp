@@ -5,18 +5,18 @@ Pos :: struct {
 }
 
 TokenizerState :: struct {
-	input:     string,
-	res:       ^[dynamic]Token,
+	input:     []rune,
+	res:       [dynamic]Token,
 	using pos: Pos,
 }
 
 grab_rune :: proc(ts: ^TokenizerState, ttype: TokenType) {
-	append(ts.res, Token{ttype, ts.input[ts.offset:ts.offset + 1], Pos{ts.offset, ts.offset}})
+	append(&ts.res, Token{ttype, ts.input[ts.offset:ts.offset + 1], Pos{ts.offset, ts.offset}})
 	advance(ts)
 }
 
 grab :: proc(ts: ^TokenizerState, ttype: TokenType, begin, end: int) {
-	append(ts.res, Token{ttype, ts.input[begin:end], Pos{begin, end}})
+	append(&ts.res, Token{ttype, ts.input[begin:end], Pos{begin, end}})
 }
 
 current :: proc(ts: ^TokenizerState) -> rune {

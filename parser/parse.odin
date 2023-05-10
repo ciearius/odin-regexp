@@ -1,9 +1,5 @@
 package parser
 
-import "core:slice"
-import "core:strings"
-import "core:unicode/utf8"
-
 import tk "../tokenizer"
 import "../vm"
 import "../ast"
@@ -59,10 +55,10 @@ parse_alphanum :: proc(ps: ^ParseState) -> (n: ast.Node, err: ParseErr) {
 	if ps.curr.ttype == .Alphanumeric {
 		m := make([dynamic]ast.Node)
 
-		for c, i in utf8.string_to_runes(ps.curr.value) {
+		for c, i in ps.curr.value {
 			c0 := make([]rune, 1)
 			c0[0] = c
-			append(&m, ast.create_match_rune_set(c0))
+			append(&m, ast.create_match_set(c0))
 		}
 
 		advance(ps)
@@ -88,8 +84,6 @@ parse_grouping :: proc(ps: ^ParseState) -> (n: ast.Node, err: ParseErr) {
 	return grouping, .None
 }
 
-
-// FIXME: endless loop!
 parse_set :: proc(ps: ^ParseState) -> (n: ast.Node, err: ParseErr) {
 	if !matches(ps, .Open_Bracket) {
 		return
@@ -133,7 +127,7 @@ parse_set :: proc(ps: ^ParseState) -> (n: ast.Node, err: ParseErr) {
 		}
 
 		if len(last_runes) == 0 && ps.curr.ttype == .Alphanumeric {
-			last_runes = utf8.string_to_runes(ps.curr.value)
+			last_runes = ps.curr.value
 
 			if is_range {
 				upper = last_runes[0]
@@ -154,7 +148,7 @@ parse_set :: proc(ps: ^ParseState) -> (n: ast.Node, err: ParseErr) {
 	set_entries := util.entries(characters)
 
 	if len(set_entries) > 0 {
-		match_set := ast.create_match_rune_set(set_entries)
+		match_set := ast.create_match_set(set_entries)
 		append(&res, match_set)
 	}
 
@@ -190,6 +184,10 @@ parse_match :: proc(ps: ^ParseState) -> (n: ast.Node, err: ParseErr) {
 	}
 
 	advance(ps)
+
+	if len(concat) == 1 {
+		return concat[0], .None
+	}
 
 	return ast.create_concatenation(concat[:]), .None
 }

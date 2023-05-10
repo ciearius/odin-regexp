@@ -1,6 +1,5 @@
 package ast
 
-import "core:unicode/utf8"
 import "core:slice"
 
 Match_Range :: struct {
@@ -23,11 +22,7 @@ create_match_range :: proc(lower, upper: rune, negated: bool = false) -> ^Match_
 	return mr
 }
 
-create_match_set :: proc(str: string, negated: bool = false) -> ^Match_Set {
-	return create_match_rune_set(utf8.string_to_runes(str), negated)
-}
-
-create_match_rune_set :: proc(cset: []rune, negated: bool = false) -> ^Match_Set {
+create_match_set :: proc(cset: []rune, negated: bool = false) -> ^Match_Set {
 	mr := new(Match_Set)
 
 	mr.cset = cset

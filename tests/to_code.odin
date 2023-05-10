@@ -29,7 +29,7 @@ t_code_from_match_set :: proc(t: ^testing.T) {
 	cb := vm.init_builder()
 	using testing
 
-	input := ast.create_match_set("abc", true)
+	input := ast.create_match_set([]rune{'a', 'b', 'c'}, true)
 	actual := vm.code_from_match_set(cb, input)
 
 	expect_value(t, len(actual), 1)
@@ -49,7 +49,7 @@ t_code_from_match_char :: proc(t: ^testing.T) {
 	cb := vm.init_builder()
 	using testing
 
-	input := ast.create_match_set("a", true)
+	input := ast.create_match_set([]rune{'a'}, true)
 	actual := vm.code_from_match_set(cb, input)
 
 	expect_value(t, len(actual), 1)
@@ -68,10 +68,10 @@ t_code_from_concatenation :: proc(t: ^testing.T) {
 
 	input := ast.create_concatenation(
 		{
-			ast.create_match_set("a"),
-			ast.create_match_set("a"),
-			ast.create_match_set("a"),
-			ast.create_match_set("a"),
+			ast.create_match_set([]rune{'a'}),
+			ast.create_match_set([]rune{'a'}),
+			ast.create_match_set([]rune{'a'}),
+			ast.create_match_set([]rune{'a'}),
 		},
 	)
 	actual := vm.code_from_concatenation(cb, input)
@@ -87,13 +87,13 @@ t_code_from_alternation :: proc(t: ^testing.T) {
 
 	input := ast.create_alternation(
 		{
-			ast.create_match_set("a"),
-			ast.create_match_set("a"),
-			ast.create_match_set("a"),
-			ast.create_match_set("a"),
+			ast.create_match_set([]rune{'a'}),
+			ast.create_match_set([]rune{'a'}),
+			ast.create_match_set([]rune{'a'}),
+			ast.create_match_set([]rune{'a'}),
 		},
 	)
 
 	actual := vm.code_from_alternation(cb, input)
-	expect_value(t, len(actual), 3+4)
+	expect_value(t, len(actual), 3 + 4)
 }

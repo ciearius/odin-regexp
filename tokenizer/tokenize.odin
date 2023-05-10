@@ -1,6 +1,6 @@
 package tokenizer
 
-import "core:strconv"
+import "core:unicode/utf8"
 import "core:fmt"
 
 import "../util"
@@ -25,9 +25,10 @@ direct_mapped := map[rune]TokenType {
 }
 
 tokenize :: proc(s: string) -> (res: [dynamic]Token) {
-	res = make([dynamic]Token)
-
-	ts := &TokenizerState{s, &res, Pos{0, len(s)}}
+	ts := new(TokenizerState)
+	ts.input = utf8.string_to_runes(s)
+	ts.res = make([dynamic]Token)
+	ts.pos = Pos{0, len(s)}
 
 	c: rune
 
@@ -70,7 +71,8 @@ tokenize :: proc(s: string) -> (res: [dynamic]Token) {
 		panic(fmt.aprintf("failed %r ", c))
 	}
 
-	append(&res, Token{ttype = .EOF})
 
-	return
+	append(&ts.res, Token{ttype = .EOF})
+
+	return ts.res
 }

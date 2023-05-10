@@ -30,6 +30,6 @@ TokenType :: enum {
 
 Token :: struct {
 	ttype:     TokenType,
-	value:     string,
+	value:     []rune,
 	using pos: Pos,
 }

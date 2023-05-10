@@ -41,7 +41,9 @@ code_from_group :: proc(c: ^ConstBuilder, node: ^ast.Group) -> Snippet {
 }
 
 code_from_match_range :: proc(c: ^ConstBuilder, node: ^ast.Match_Range) -> Snippet {
-	return collect({code(.RANGE, create_param_range(node.range, node.negated))})
+	return collect(
+		{code(.RANGE, create_param_range([2]rune{node.range[0], node.range[1]}, node.negated))},
+	)
 }
 
 code_from_match_set :: proc(c: ^ConstBuilder, node: ^ast.Match_Set) -> Snippet {
@@ -99,7 +101,7 @@ code_from_alternation :: proc(c: ^ConstBuilder, node: ^ast.Alternation) -> Snipp
 		}
 
 		head[idx] = code(.SPLIT, create_param_split(o0[idx] + idxO0, 1))
-		idx+=1
+		idx += 1
 	}
 
 	r := [2]Snippet{head, slice.concatenate(blocks[:])}
