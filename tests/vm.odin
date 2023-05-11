@@ -98,6 +98,7 @@ test_optional_stress :: proc(t: ^testing.T) {
 			'a',
 		},
 	)
+
 	// fmt.println("As expected!" if result1 else "It doesn't...?!")
 	testing.expect_value(t, result1, true)
 }

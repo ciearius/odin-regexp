@@ -8,66 +8,67 @@ import c "../compiler"
 run :: proc(code: []b.Instruction, sets: []c.Charset, input: []rune) -> bool #no_bounds_check {
 	stack := make([dynamic]ExecutionContext, 0, len(code))
 
-	ctx := ExecutionContext {
-		ip = 0,
-		sp = 0,
-	}
+	ok := true
+	ip := 0
+	sp := 0
 
 	crune: rune
 	instr: b.Instruction
 
-	for !ctx.failed {
+	for ok {
 		crune = 0
 		instr = {}
 
-		if len(input) > ctx.sp {
-			crune = input[ctx.sp]
+		if sp < len(input) {
+			crune = input[sp]
 		}
-		if len(code) > ctx.ip {
-			instr = code[ctx.ip]
+		if ip < len(code) {
+			instr = code[ip]
 		}
 
+		// fmt.println(b.to_string(instr))
+
 		if .JUMP == instr.code {
-			ctx.ip += instr.idx
+			ip += instr.idx
 			continue
 		}
 
 		if .SPLIT == instr.code {
-			append(&stack, split_context(&ctx, instr.split[1], 0))
-			ctx.ip += instr.split[0]
+			append(&stack, create_context(ip + instr.split[1], ip))
+			ip += instr.split[0]
 			continue
 		}
 
 		if .CHAR == instr.code {
 			if instr.char == crune {
-				ctx.ip += 1
-				ctx.sp += 1
+				ip += 1
+				sp += 1
 				continue
 			}
 
-			ctx = next_context(&stack)
+			ip, sp, ok = next_context(&stack)
 			continue
 		}
 
 		if .SET == instr.code {
 			if _, ok := slice.binary_search(sets[instr.idx], crune); ok {
-				ctx.ip += 1
-				ctx.sp += 1
+				ip += 1
+				sp += 1
 				continue
 			}
 
-			ctx = next_context(&stack)
+			ip, sp, ok = next_context(&stack)
 			continue
 		}
 
 		if .RANGE == instr.code {
 			if instr.range[0] <= crune && crune <= instr.range[1] {
-				ctx.ip += 1
-				ctx.sp += 1
+				ip += 1
+				sp += 1
 				continue
 			}
 
-			ctx = next_context(&stack)
+			ip, sp, ok = next_context(&stack)
 			continue
 		}
 
