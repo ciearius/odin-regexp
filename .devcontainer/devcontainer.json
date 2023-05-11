@@ -11,7 +11,8 @@
 			"extensions": [
 				"DanielGavin.ols",
 				"bierner.markdown-mermaid",
-				"task.vscode-task"
+				"task.vscode-task",
+				"vadimcn.vscode-lldb"
 			]
 		}
 	}
