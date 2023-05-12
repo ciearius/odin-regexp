@@ -14,51 +14,46 @@ import "./bytecode"
 import "./util"
 
 main :: proc() {
-	for i in 1 ..= 30 {
-		stress(i)
+	iterations := 25
+	start := time.now()
+
+	for i in 0 ..= iterations {
+		stress(20)
 	}
+
+	took := time.since(start)
+	fmt.printf("%v for %v iterations\n", time.duration_milliseconds(took), iterations)
+	fmt.println(took / auto_cast iterations)
 }
 
 stress :: proc(n: int) {
-	regexp := util.build_torture_regex(n)
+	exp := util.build_torture_regex(n)
 
-	fmt.println(regexp)
+	defer delete(exp)
 
-	tokens := tokenizer.tokenize(regexp)
+	tokens := tokenizer.tokenize(exp)
+
+	defer delete(tokens)
+
 	tree, err := parser.parse(tokens)
 
 	if err != .None {
-		fmt.println("Failed to parse tokens...")
+		panic("failed to parse")
 	}
+
+	defer ast.destroy_node(tree)
 
 	const, code := compiler.compile(tree)
 
-	input := make([]rune, n)
+	input0_failing := util.build_input(n - 1, 'a')
+	input1_matching := util.build_input(n, 'a')
 
-	slice.fill(input, 'a')
+	defer delete(input0_failing)
+	defer delete(input1_matching)
 
-	fmt.println("using n =", n)
-	sw := time.now()
+	match0 := vm.run(code, const, input0_failing)
+	assert(!match0, "expect too short string not to match")
 
-	r0 := vm.run(code, const, input)
-
-	fmt.println("took", time.duration_milliseconds(time.since(sw)), "ms")
-
-	if r0 {
-		fmt.println("match found!")
-	} else {
-		fmt.println("no match was found")
-	}
-
-	input[n - 1] = 'c'
-
-	r1 := vm.run(code, const, input)
-
-	fmt.println("took", time.duration_milliseconds(time.since(sw)), "ms")
-
-	if r1 {
-		fmt.println("match found!")
-	} else {
-		fmt.println("no match was found")
-	}
+	match1 := vm.run(code, const, input1_matching)
+	assert(match1, "expect match")
 }

@@ -5,8 +5,9 @@ import "core:slice"
 import b "../bytecode"
 import c "../compiler"
 
+@(optimization_mode = "speed")
 run :: proc(code: []b.Instruction, sets: []c.Charset, input: []rune) -> bool #no_bounds_check {
-	stack := make([dynamic]ExecutionContext, 0, len(code))
+	stack := make([dynamic]^ExecutionContext, 0, len(code))
 
 	ok := true
 	ip := 0
@@ -34,7 +35,11 @@ run :: proc(code: []b.Instruction, sets: []c.Charset, input: []rune) -> bool #no
 		}
 
 		if .SPLIT == instr.code {
-			append(&stack, create_context(ip + instr.split[1], ip))
+			a := new(ExecutionContext)
+			a^ = ExecutionContext{ip + instr.split[1], sp}
+
+			append(&stack, a)
+
 			ip += instr.split[0]
 			continue
 		}
