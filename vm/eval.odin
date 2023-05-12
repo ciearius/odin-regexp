@@ -7,81 +7,61 @@ import c "../compiler"
 
 @(optimization_mode = "speed")
 run :: proc(code: []b.Instruction, sets: []c.Charset, input: []rune) -> bool #no_bounds_check {
-	stack := make([dynamic]^ExecutionContext, 0, len(code))
+	stack := stack_init(len(code))
 
-	ok := true
-	ip := 0
-	sp := 0
+	defer stack_destroy(stack)
 
-	crune: rune
-	instr: b.Instruction
+	ip, sp := 0, 0
+	ok, drop_ctx := true, false
 
 	for ok {
-		crune = 0
-		instr = {}
+		instr := code[ip]
+		curr := input[sp]
 
-		if sp < len(input) {
-			crune = input[sp]
-		}
-		if ip < len(code) {
-			instr = code[ip]
-		}
-
-		// fmt.println(b.to_string(instr))
-
-		if .JUMP == instr.code {
+		switch instr.code {
+		case .JUMP:
 			ip += instr.idx
-			continue
-		}
 
-		if .SPLIT == instr.code {
-			a := new(ExecutionContext)
-			a^ = ExecutionContext{ip + instr.split[1], sp}
-
-			append(&stack, a)
-
+		case .SPLIT:
+			stack_push(stack, ip + instr.split[1], sp)
 			ip += instr.split[0]
-			continue
-		}
 
-		if .CHAR == instr.code {
-			if instr.char == crune {
+		case .CHAR:
+			if instr.char == curr {
 				ip += 1
 				sp += 1
 				continue
 			}
+			drop_ctx = true
 
-			ip, sp, ok = next_context(&stack)
-			continue
-		}
-
-		if .SET == instr.code {
-			if _, ok := slice.binary_search(sets[instr.idx], crune); ok {
+		case .SET:
+			if _, ok := slice.binary_search(sets[instr.idx], curr); ok {
 				ip += 1
 				sp += 1
 				continue
 			}
+			drop_ctx = true
 
-			ip, sp, ok = next_context(&stack)
-			continue
-		}
-
-		if .RANGE == instr.code {
-			if instr.range[0] <= crune && crune <= instr.range[1] {
+		case .RANGE:
+			if instr.range[0] <= curr && curr <= instr.range[1] {
 				ip += 1
 				sp += 1
 				continue
 			}
+			drop_ctx = true
 
-			ip, sp, ok = next_context(&stack)
-			continue
-		}
-
-		if .MATCH == instr.code {
+		case .MATCH:
 			return true
+
+		case .Err:
+			break
+
 		}
 
-		break
+		if drop_ctx {
+			ip, sp, ok = stack_pop(stack)
+			drop_ctx = false
+		}
 	}
 
 	return false
