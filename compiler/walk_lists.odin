@@ -7,7 +7,7 @@ import "../bytecode"
 
 
 code_from_concatenation :: proc(c: ^ConstBuilder, node: ^ast.Concatenation) -> Snippet {
-	gen := make([dynamic]^bytecode.Instruction)
+	gen := make([dynamic]bytecode.Instruction)
 
 	for n in node.nodes {
 		append(&gen, ..code_from(c, n))

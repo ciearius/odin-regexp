@@ -11,8 +11,8 @@ import "./compiler"
 import "./util"
 
 main :: proc() {
-	nLen := 22
-	iterations := 20
+	nLen := 20
+	iterations := 25
 
 	track_valid := new(time.Stopwatch)
 	track_invalid := new(time.Stopwatch)

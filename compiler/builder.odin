@@ -4,7 +4,7 @@ import "core:slice"
 
 import "../bytecode"
 
-Snippet :: []^bytecode.Instruction
+Snippet :: []bytecode.Instruction
 Charset :: []rune
 
 ConstBuilder :: struct {

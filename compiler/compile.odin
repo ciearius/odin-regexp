@@ -8,12 +8,12 @@ import "../ast"
 compile :: proc(tree: ast.Node) -> ([]Charset, []bytecode.Instruction) {
 	cb := init_builder()
 
-	code := to_code(cb, append_instr(code_from(cb, tree), bytecode.instr_match()))
+	code := append_instr(code_from(cb, tree), bytecode.instr_match())
 
 	return to_const(cb), code
 }
 
-create_snippet :: proc(ii: ..^bytecode.Instruction) -> Snippet {
+create_snippet :: proc(ii: ..bytecode.Instruction) -> Snippet {
 	s := make(Snippet, len(ii))
 
 	for i, idx in ii {
@@ -23,10 +23,10 @@ create_snippet :: proc(ii: ..^bytecode.Instruction) -> Snippet {
 	return s
 }
 
-append_instr :: proc(snip: Snippet, ii: ..^bytecode.Instruction) -> Snippet {
+append_instr :: proc(snip: Snippet, ii: ..bytecode.Instruction) -> Snippet {
 	return slice.concatenate([]Snippet{snip, ii})
 }
 
-prepend_instr :: proc(snip: Snippet, ii: ..^bytecode.Instruction) -> Snippet {
+prepend_instr :: proc(snip: Snippet, ii: ..bytecode.Instruction) -> Snippet {
 	return slice.concatenate([]Snippet{ii, snip})
 }
