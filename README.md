@@ -1,4 +1,4 @@
-# Efficient RegExp
+# ~~Efficient~~ RegExp
 
 Heavily inspired by [this series of articles](https://swtch.com/~rsc/regexp/regexp1.html).
 
