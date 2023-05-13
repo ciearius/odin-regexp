@@ -16,3 +16,24 @@ code_from_match_set :: proc(c: ^ConstBuilder, node: ^ast.Match_Set) -> Snippet {
 
 	return create_snippet(bytecode.instr_set(add(c, node.cset), node.negated))
 }
+
+code_from_match_charclass :: proc(cb: ^ConstBuilder, node: ^ast.Match_CharClass) -> Snippet {
+	switch node.class {
+
+	case .Digit:
+		return create_snippet(bytecode.instr_range('0', '9', node.negated))
+
+	case .Word:
+		word_class := [?]ast.Node{
+			ast.create_match_range('a', 'z', node.negated),
+			ast.create_match_range('A', 'Z', node.negated),
+			ast.create_match_range('0', '9', node.negated),
+			ast.create_match_set([]rune{'_'}, node.negated),
+		}
+
+		return code_from_alternation(cb, ast.create_alternation(word_class[:]))
+
+	}
+
+	panic("not a charclass")
+}

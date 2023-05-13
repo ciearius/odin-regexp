@@ -47,6 +47,10 @@ parse_expression :: proc(ps: ^ParseState) -> (res: ast.Node, err: ParseErr) {
 		return
 	}
 
+	if res = parse_escaped(ps) or_return; res != nil {
+		return
+	}
+
 	// TODO: Like this?
 	return nil, .Invalid
 }
@@ -127,6 +131,10 @@ parse_set :: proc(ps: ^ParseState) -> (n: ast.Node, err: ParseErr) {
 			continue
 		}
 
+		if ps.curr.ttype == .Escaped {
+			append(&ranges, parse_escaped(ps) or_return)
+		}
+
 		if ps.curr.ttype == .Close_Bracket {
 			break
 		}
@@ -178,6 +186,14 @@ parse_set :: proc(ps: ^ParseState) -> (n: ast.Node, err: ParseErr) {
 	}
 
 	return ast.create_alternation(res[:]), .None
+}
+
+parse_escaped :: proc(ps: ^ParseState) -> (n: ast.Node, err: ParseErr) {
+	if ps.curr.ttype != .Escaped {
+		return nil, .None
+	}
+
+	return ast.create_match_char_class(ps.curr.value[0]), .None
 }
 
 parse_match :: proc(ps: ^ParseState) -> (n: ast.Node, err: ParseErr) {

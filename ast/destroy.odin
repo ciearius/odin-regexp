@@ -11,6 +11,10 @@ destroy_node :: proc(n: Node) {
 		defer free(m)
 		delete(m.cset)
 
+	case ^Match_CharClass:
+		m := n.(^Match_CharClass)
+		free(m)
+
 	case ^Match_Range:
 		m := n.(^Match_Range)
 		free(m)

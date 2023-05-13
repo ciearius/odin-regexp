@@ -16,6 +16,9 @@ code_from :: proc(c: ^ConstBuilder, node: ast.Node) -> Snippet {
 	case ^ast.Match_Set:
 		return code_from_match_set(c, node.(^ast.Match_Set))
 
+	case ^ast.Match_CharClass:
+		return code_from_match_charclass(c, node.(^ast.Match_CharClass))
+
 	case ^ast.Concatenation:
 		return code_from_concatenation(c, node.(^ast.Concatenation))
 
