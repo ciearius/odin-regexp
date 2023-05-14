@@ -25,9 +25,9 @@ code_from_match_charclass :: proc(cb: ^ConstBuilder, node: ^ast.Match_CharClass)
 
 	case .Word:
 		word_class := [?]ast.Node{
+			ast.create_match_range('0', '9', node.negated),
 			ast.create_match_range('a', 'z', node.negated),
 			ast.create_match_range('A', 'Z', node.negated),
-			ast.create_match_range('0', '9', node.negated),
 			ast.create_match_set([]rune{'_'}, node.negated),
 		}
 
