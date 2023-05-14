@@ -3,6 +3,7 @@ package tests
 import "core:testing"
 import "core:slice"
 
+import "../suite"
 
 import "../ast"
 import "../parser"
@@ -15,40 +16,119 @@ PATTERN_Email :: `[\w\.+-]+@[\w\.-]+\.[\w\.-]+`
 PATTERN_URI :: `[\w]+://[^/\s?#]+[^\s?#]+(?:\?[^\s#]*)?(?:#[^\s]*)?`
 PATTERN_IPv4 :: `(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9])`
 
-// TODO: setup tests with `setup_test`
+@(test)
+test_charclass_tokenize :: proc(t: ^testing.T) {
+	suite.describe_tokenizer_test(
+		t,
+		`\w`,
+		tokenizer.Token{ttype = .Escaped, value = {'w'}},
+		tokenizer.Token{ttype = .EOF},
+	)
 
-setup_test :: proc(
-	t: ^testing.T,
-	input: string,
-	expected_tokens: []tokenizer.Token,
-	expected_tree: ast.Node,
-	expected_charsets: []compiler.Charset,
-	expected_code: compiler.Snippet,
-) {
-	using testing
+	suite.describe_tokenizer_test(
+		t,
+		`\W`,
+		tokenizer.Token{ttype = .Escaped, value = {'W'}},
+		tokenizer.Token{ttype = .EOF},
+	)
 
-	// TOKENIZER
-	tokens := tokenizer.tokenize(input)
+	suite.describe_tokenizer_test(
+		t,
+		`\d`,
+		tokenizer.Token{ttype = .Escaped, value = {'d'}},
+		tokenizer.Token{ttype = .EOF},
+	)
 
-	for actual, i in tokens {
-		expected := expected_tokens[i]
-		expect_value(t, actual.ttype, expected.ttype)
-		expect(t, slice.equal(actual.value, expected.value))
-	}
+	suite.describe_tokenizer_test(
+		t,
+		`\D`,
+		tokenizer.Token{ttype = .Escaped, value = {'D'}},
+		tokenizer.Token{ttype = .EOF},
+	)
+}
 
-	// PARSER
-	tree, err := parser.parse(tokens)
+@(test)
+test_charclass_parse :: proc(t: ^testing.T) {
+	suite.describe_parser_test(
+		t,
+		{tokenizer.Token{ttype = .Escaped, value = {'w'}}, tokenizer.Token{ttype = .EOF}},
+		ast.create_match_charclass(.Word, false),
+	)
 
-	expect_value(t, err, parser.ParseErr.None)
+	suite.describe_parser_test(
+		t,
+		{tokenizer.Token{ttype = .Escaped, value = {'W'}}, tokenizer.Token{ttype = .EOF}},
+		ast.create_match_charclass(.Word, true),
+	)
 
-	// COMPILER
-	charsets, code := compiler.compile(tree)
+	suite.describe_parser_test(
+		t,
+		{tokenizer.Token{ttype = .Escaped, value = {'d'}}, tokenizer.Token{ttype = .EOF}},
+		ast.create_match_charclass(.Digit, false),
+	)
 
-	for actual_charset, charsetIndex in charsets {
-		expect(t, slice.equal(actual_charset, expected_charsets[charsetIndex]))
-	}
+	suite.describe_parser_test(
+		t,
+		{tokenizer.Token{ttype = .Escaped, value = {'D'}}, tokenizer.Token{ttype = .EOF}},
+		ast.create_match_charclass(.Digit, true),
+	)
+}
 
-	for actual_instruction, instrIndex in code {
-		expect_value(t, actual_instruction, expected_code[instrIndex])
-	}
+@(test)
+test_charclass_compile :: proc(t: ^testing.T) {
+	/*
+
+		e1|e2
+
+		SPLIT L1, L2
+	L1:	TEST e1
+		Match
+	L2: Test e2
+		Match
+
+
+		e1|e2|e3
+
+		SPLIT L3, 1
+		SPLIT L2, 1
+	L1: Test e1
+		Match
+	L2: Test e2
+		Match
+	L3: Test e3
+		Match
+	
+	*/
+	suite.describe_compiler_test(
+		t,
+		ast.create_match_charclass(.Word, false),
+		{},
+		bytecode.instr_split(9, 1),
+		bytecode.instr_split(6, 1),
+		bytecode.instr_split(3, 1),
+		bytecode.instr_range('0', '9', false), // L0
+		bytecode.instr_jump(6),
+		bytecode.instr_range('a', 'z', false), // L1
+		bytecode.instr_jump(4),
+		bytecode.instr_range('A', 'Z', false), // L2
+		bytecode.instr_jump(2),
+		bytecode.instr_char('_', false), // L3
+		bytecode.instr_match(),
+	)
+
+	suite.describe_compiler_test(
+		t,
+		ast.create_match_charclass(.Digit, false),
+		{},
+		bytecode.instr_range('0', '9', false),
+		bytecode.instr_match(),
+	)
+
+	suite.describe_compiler_test(
+		t,
+		ast.create_match_charclass(.Digit, true),
+		{},
+		bytecode.instr_range('0', '9', true),
+		bytecode.instr_match(),
+	)
 }
