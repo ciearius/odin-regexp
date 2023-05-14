@@ -7,3 +7,6 @@ libs/*
 
 # Taskfile related
 .task
+
+# macOS
+.DS_Store
