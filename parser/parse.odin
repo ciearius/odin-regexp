@@ -5,7 +5,7 @@ import "../vm"
 import "../ast"
 import "../util"
 
-parse :: proc(tokens: [dynamic]tk.Token) -> (n: ast.Node, err: ParseErr) {
+parse :: proc(tokens: []tk.Token) -> (n: ast.Node, err: ParseErr) {
 	ps := create_parserstate(tokens)
 
 	exprs := make([dynamic]ast.Node)

@@ -5,12 +5,12 @@ import "../ast"
 
 ParseState :: struct {
 	offset: int,
-	tokens: [dynamic]tk.Token,
+	tokens: []tk.Token,
 	tree:   ast.Node,
 	curr:   tk.Token,
 }
 
-create_parserstate :: proc(tokens: [dynamic]tk.Token) -> ^ParseState {
+create_parserstate :: proc(tokens: []tk.Token) -> ^ParseState {
 	ps := new(ParseState)
 
 	ps.tokens = tokens
