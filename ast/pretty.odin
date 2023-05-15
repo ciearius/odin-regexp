@@ -24,6 +24,12 @@ prettyPrint :: proc(n: Node, depth: int = 0) {
 		fmt.println(d, ("\tnot" if m.negated else "\t"), m.range)
 		fmt.println(d, "}")
 
+	case ^Match_CharClass:
+		m := n.(^Match_CharClass)
+		fmt.println(d, "^Match_CharClass {")
+		fmt.println(d, ("\tnot" if m.negated else "\t"), m.class)
+		fmt.println(d, "}")
+
 	case ^Concatenation:
 		prettyPrint_NodeCollection("Concatenation", n.(^Concatenation), depth)
 

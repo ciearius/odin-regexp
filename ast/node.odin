@@ -8,6 +8,7 @@ Node :: union {
 	// Matching
 	^Match_Range,
 	^Match_Set,
+	^Match_CharClass,
 
 	// Collections
 	^Concatenation,

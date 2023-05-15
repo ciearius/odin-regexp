@@ -45,13 +45,13 @@ main :: proc() {
 	total_valid := time.stopwatch_duration(track_valid^)
 	total_invalid := time.stopwatch_duration(track_invalid^)
 
-	fmt.printf("Time tracked %#v\n", time.duration_milliseconds(total_valid + total_invalid))
+	fmt.println("Time tracked\t", cast(time.Duration)total_valid + total_invalid)
 
 	per_valid: time.Duration = total_valid / auto_cast iterations
 	per_invalid: time.Duration = total_invalid / auto_cast iterations
 
-	fmt.printf("valid match\t%v\n", time.duration_milliseconds(per_valid))
-	fmt.printf("invalid match\t%v\n", time.duration_milliseconds(per_invalid))
+	fmt.println("valid match\t", cast(time.Duration)per_valid)
+	fmt.println("invalid match\t", cast(time.Duration)per_invalid)
 
 	free(track_valid)
 	free(track_invalid)

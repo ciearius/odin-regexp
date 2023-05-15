@@ -24,7 +24,7 @@ direct_mapped := map[rune]TokenType {
 	'}' = .Close_Brace,
 }
 
-tokenize :: proc(s: string) -> (res: [dynamic]Token) {
+tokenize :: proc(s: string) -> (res: []Token) {
 	ts := new(TokenizerState)
 	ts.input = utf8.string_to_runes(s)
 	ts.res = make([dynamic]Token)
@@ -73,5 +73,5 @@ tokenize :: proc(s: string) -> (res: [dynamic]Token) {
 
 	append(&ts.res, create_token(.EOF, []rune{}, Pos{}))
 
-	return ts.res
+	return ts.res[:]
 }
