@@ -12,7 +12,8 @@
 				"DanielGavin.ols",
 				"bierner.markdown-mermaid",
 				"task.vscode-task",
-				"vadimcn.vscode-lldb"
+				"vadimcn.vscode-lldb",
+				"mhutchie.git-graph"
 			]
 		}
 	}
