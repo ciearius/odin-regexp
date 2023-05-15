@@ -1,0 +1,33 @@
+version: '3'
+# https://taskfile.dev
+
+shopt: [globstar]
+
+tasks:
+  init:
+    desc: "Download and (if necessary) build all dependencies."
+    cmds:
+      - task: pull
+      - task: init-linux
+
+  pull:
+    dir: ./libs
+    cmds:
+      - git clone --depth=1 https://github.com/odin-lang/Odin.git compiler
+    generates:
+      - "compiler"
+    status:
+      - "test -f compiler/README.md"
+
+  init-linux:
+    desc: "Setup the Odin language compiler"
+    platforms: ["linux"]
+    internal: true
+    dir: ./libs/compiler
+    env:
+      LLVM_CONFIG: llvm14-config
+      CXX: clang-14
+    cmds:
+      - ./build_odin.sh release
+    generates:
+      - "Odin.bin"

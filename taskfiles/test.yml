@@ -1,0 +1,19 @@
+version: '3'
+# https://taskfile.dev
+
+shopt: [globstar]
+
+tasks:
+  default:
+    desc: "Run all tests."
+    sources:
+      - ./**/*.odin
+    cmds:
+      - ./libs/compiler/odin test ./tests
+
+  file:
+    desc: "Run all tests in a single odin file."
+    sources:
+      - ./**/*.odin
+    cmds:
+      - ./libs/compiler/odin test {{.CLI_ARGS}} -file

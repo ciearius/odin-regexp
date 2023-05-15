@@ -3,76 +3,9 @@ version: '3'
 
 shopt: [globstar]
 
+includes:
+  odin: ./taskfiles/odin.yml
+  build: ./taskfiles/build.yml
+  test: ./taskfiles/test.yml
+
 tasks:
-  build-speed:
-    desc: "Build main.odin with speed optimization."
-    cmds:
-      - "odin build . -o:speed -out=oregexp{{exeExt}}"
-    
-  build:
-    desc: "Build main.odin with no optimization."
-    cmds:
-      - "odin build . -o:none -out=oregexp{{exeExt}}"
-
-  init-dependencies:
-    desc: "Download and (if necessary) build all dependencies."
-    cmds:
-      - task: pull-odin
-      - task: init-odin-linux
-      - task: init-odin-windows
-
-  pull-odin:
-    dir: ./libs
-    cmds:
-      - git clone --depth=1 https://github.com/odin-lang/Odin.git compiler
-    generates:
-      - "compiler"
-    status:
-      - "test -f compiler/README.md"
-
-  init-odin-linux:
-    desc: "Setup the Odin language compiler"
-    platforms: ["linux"]
-    internal: true
-    dir: ./libs/compiler
-    env:
-      LLVM_CONFIG: /usr/bin/llvm-config-14
-      CXX: /usr/lib/llvm-14/bin/clang
-    cmds:
-      - ./build_odin.sh release
-    generates:
-      - "Odin.bin"
-
-  init-odin-windows:
-    desc: "Setup the Odin language compiler"
-    platforms: ["windows"]
-    internal: true
-    dir: ./libs/compiler
-    vars:
-      CMD_INIT_VS: "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Auxiliary\\Build\\vcvarsall.bat\" x64"
-      CMD_SHELL_VS: "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\Common7\\Tools\\VsDevCmd.bat\""
-    cmds:
-      # - "{{.CMD_INIT_VS}} && {{.CMD_SHELL_VS}} /k build.bat"
-      - "'C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Auxiliary\\Build\\vcvarsall.bat' x64; build.bat"
-    generates:
-      - "Odin.exe"
-
-  test-file:
-    desc: "Run all tests in a single odin file."
-    sources:
-      - ./**/*.odin
-    cmds:
-      - odin test {{.CLI_ARGS}} -file
-
-  pull-perf:
-    dir: ./libs
-    cmds:
-      - git clone --depth=1 https://github.com/microsoft/WSL2-Linux-Kernel.git perf
-    generates:
-      - perf/README.md
-
-  init-perf:
-    dir: ./libs/perf/tools/perf
-    deps: [pull-perf]
-    cmds:
-      - make

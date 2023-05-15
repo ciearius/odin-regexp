@@ -1,0 +1,15 @@
+version: '3'
+# https://taskfile.dev
+
+shopt: [globstar]
+
+tasks:
+  speed:
+    desc: "Build with speed optimization."
+    cmds:
+      - "./libs/compiler/odin build . -o:speed -out=oregexp{{exeExt}}"
+    
+  default:
+    desc: "Build with no optimization."
+    cmds:
+      - "./libs/compiler/odin build . -o:none -out=oregexp{{exeExt}}"
