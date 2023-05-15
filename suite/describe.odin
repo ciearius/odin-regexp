@@ -47,15 +47,19 @@ describe_compiler_test :: proc(
 		testing.expect(t, slice.equal(actual_charset, expected_charsets[charsetIndex]))
 	}
 
-	failed := false
+	ok := true
 
-	for actual_instruction, instrIndex in code {
-		if actual_instruction != expected_code[instrIndex] {
-			failed = true
+	if len(code) != len(expected_code) {
+		ok = false
+	} else {
+		for actual_instruction, instrIndex in code {
+			if actual_instruction != expected_code[instrIndex] {
+				ok = false
+			}
 		}
 	}
 
-	if failed {
+	if !ok {
 		testing.logf(t, "Expected\n")
 		for instr in expected_code {
 			testing.logf(t, "%v", bytecode.to_string(instr))
@@ -65,7 +69,7 @@ describe_compiler_test :: proc(
 		for instr in code {
 			testing.logf(t, "%v", bytecode.to_string(instr))
 		}
-	}
 
-	testing.expect(t, !failed, "instructions match")
+		testing.fail(t)
+	}
 }

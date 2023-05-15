@@ -16,66 +16,70 @@ code_from_concatenation :: proc(c: ^ConstBuilder, node: ^ast.Concatenation) -> S
 	return gen[:]
 }
 
+calc_b0 :: #force_inline proc(blocks: []Snippet) -> []int {
+	b0 := make([]int, len(blocks))
+
+	for block, idx in blocks {
+		if idx == 0 {
+			continue
+		}
+		b0[idx] = b0[idx - 1] + len(blocks[idx - 1])
+	}
+
+	return b0
+}
+
+generate_alternation_header :: #force_inline proc(b0: []int) -> Snippet {
+	bCount := len(b0)
+	hCount := bCount - 1
+
+	code := make(Snippet, hCount)
+
+	for i in 0 ..< hCount {
+		index := b0[i] + hCount
+		code[i] = bytecode.instr_split(index, 1)
+	}
+
+	last_header := hCount - 1
+	code[last_header].split[1] = b0[hCount] + hCount
+
+	return code
+}
+
 code_from_alternation :: proc(cb: ^ConstBuilder, node: ^ast.Alternation) -> Snippet {
 	blockCount := len(node.nodes)
-	headerSize := blockCount - 1
+	hCount := blockCount - 1
 
 	if blockCount < 2 {
 		panic("cant alternate a single path")
 	}
 
-	offset := make([]int, blockCount)
 	blocks := make([]Snippet, blockCount)
 
-	sum := 0
-	lastIdx := len(blocks) - 1
+	for rawBlock, i in node.nodes {
+		code := code_from(cb, rawBlock)
 
-	for block, blockIdx in node.nodes {
-		codeBlock := code_from(cb, block)
-		jmpEnd := bytecode.instr_jump(-1)
-
-		if blockIdx == lastIdx {
-			blocks[blockIdx] = codeBlock
-		} else {
-			blocks[blockIdx] = slice.concatenate([]Snippet{codeBlock, {jmpEnd}})
+		// Append jump instruction to all but the last block
+		if blockCount - 1 != i {
+			code = append_instr(code, bytecode.instr_jump(-1))
 		}
 
-		offset[blockIdx] = headerSize + sum
-
-		sum += len(blocks[blockIdx])
+		blocks[i] = code
 	}
 
-	sum = 1
+	b0 := calc_b0(blocks)
 
-	for rev := lastIdx; rev >= 0; rev -= 1 {
-		if rev != lastIdx {
-			// jmp instr
-			blocks[rev][len(blocks[rev]) - 1].idx = sum
-			continue
-		}
+	header := generate_alternation_header(b0)
 
-		sum += len(blocks[rev])
+	last_block_idx := len(b0) - 1
+	full_offset := b0[last_block_idx]
+	block: Snippet
+
+	for i in 0 ..< last_block_idx {
+		block = blocks[i]
+
+		block[len(block) - 1].idx = full_offset - b0[i]
 	}
 
-	head := make(Snippet, headerSize)
-
-	lineIdx := 0
-
-	for lineIdx < blockCount {
-		lineOffset := headerSize - 1 - lineIdx
-
-		if lineIdx == blockCount - 2 {
-			head[lineIdx] = bytecode.instr_split(
-				offset[lineIdx] + lineOffset,
-				offset[lineIdx + 1] + lineOffset,
-			)
-
-			break
-		}
-
-		head[lineIdx] = bytecode.instr_split(offset[lineIdx] + lineOffset, 1)
-		lineIdx += 1
-	}
-
-	return slice.concatenate([]Snippet{head, slice.concatenate(blocks[:])})
+	return slice.concatenate([]Snippet{header, slice.concatenate(blocks)})
 }
