@@ -4,13 +4,12 @@ import "core:testing"
 import "core:slice"
 import "core:fmt"
 
-import "../suite"
-
-import "../ast"
-import "../parser"
-import "../tokenizer"
-import "../bytecode"
-import "../compiler"
+import "../src/suite"
+import "../src/ast"
+import "../src/parser"
+import "../src/tokenizer"
+import "../src/bytecode"
+import "../src/compiler"
 
 // When everything in these patterns is supported, we can compare the results to https://github.com/mariomka/regex-benchmark
 PATTERN_Email :: `[\w\.+-]+@[\w\.-]+\.[\w\.-]+`

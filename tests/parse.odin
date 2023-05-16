@@ -3,9 +3,9 @@ package tests
 import "core:testing"
 import "core:fmt"
 
-import "../tokenizer"
-import "../parser"
-import "../ast"
+import "../src/tokenizer"
+import "../src/parser"
+import "../src/ast"
 
 // @(test)
 // test_tokenize :: proc(t: ^testing.T) {

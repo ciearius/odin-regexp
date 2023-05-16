@@ -4,9 +4,9 @@ import "core:testing"
 import "core:slice"
 import "core:fmt"
 
-import "../compiler"
-import "../ast"
-import "../bytecode"
+import "../src/compiler"
+import "../src/ast"
+import "../src/bytecode"
 
 @(test)
 t_code_from_group :: proc(t: ^testing.T) {

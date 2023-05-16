@@ -23,6 +23,7 @@ tasks:
     dir: ./libs/langserver
     internal: true
     platforms: ["linux", "darwin"]
+    deps: [pull]
     cmds:
       - ../compiler/odin build src/ -collection:shared=src -out:ols -o:speed
     sources:

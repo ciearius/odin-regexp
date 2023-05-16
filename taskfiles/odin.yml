@@ -23,6 +23,7 @@ tasks:
     dir: ./libs/compiler
     internal: true
     platforms: ["linux", "darwin"]
+    deps: [pull]
     env:
       LDFLAGS: "-L{{.LLVM_LIB}}"
       CPPFLAGS: "-I{{.LLVM_INCLUDE}}"

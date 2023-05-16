@@ -7,9 +7,9 @@ tasks:
   speed:
     desc: "Build with speed optimization."
     cmds:
-      - "./libs/compiler/odin build . -o:speed -out=oregexp{{exeExt}}"
+      - "./libs/compiler/odin build ./src -o:speed -out=oregexp{{exeExt}}"
     
   default:
     desc: "Build with no optimization."
     cmds:
-      - "./libs/compiler/odin build . -o:none -out=oregexp{{exeExt}}"
+      - "./libs/compiler/odin build ./src -o:none -out=oregexp{{exeExt}}"

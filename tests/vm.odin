@@ -5,13 +5,13 @@ import "core:fmt"
 import "core:slice"
 
 
-import "../tokenizer"
-import "../parser"
-import "../ast"
-import "../vm"
-import "../compiler"
-import "../bytecode"
-import "../util"
+import "../src/tokenizer"
+import "../src/parser"
+import "../src/ast"
+import "../src/vm"
+import "../src/compiler"
+import "../src/bytecode"
+import "../src/util"
 
 @(test)
 test_vm :: proc(t: ^testing.T) {
