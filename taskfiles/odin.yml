@@ -20,13 +20,18 @@ tasks:
       - task: init-linux
 
   init-linux:
-    platforms: ["linux"]
-    internal: true
     dir: ./libs/compiler
+    internal: true
+    platforms: ["linux", "darwin"]
     env:
-      LLVM_CONFIG: llvm14-config
-      CXX: clang-14
+      LDFLAGS: "-L{{.LLVM_LIB}}"
+      CPPFLAGS: "-I{{.LLVM_INCLUDE}}"
+      LLVM_CONFIG: "{{.LLVM_CONFIG}}"
+      CXX: "{{.CLANG}}"
     cmds:
       - ./build_odin.sh release
+    sources:
+      - "**/*.cpp"
+      - "**/*.odin"
     generates:
-      - "Odin.bin"
+      - "odin"

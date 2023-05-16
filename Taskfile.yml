@@ -3,6 +3,8 @@ version: '3'
 
 shopt: [globstar]
 
+dotenv: [ ".env" ]
+
 includes:
   build: ./taskfiles/build.yml
   test: ./taskfiles/test.yml
@@ -11,9 +13,8 @@ includes:
 
 tasks:
   init:
+    deps: [odin:pull, ols:pull]
     desc: "Download and (if necessary) build all dependencies."
     cmds:
-      - task: odin:pull
       - task: odin:init-linux
-      - task: ols:pull
       - task: ols:init-linux

@@ -20,12 +20,12 @@ tasks:
       - task: init-linux
 
   init-linux:
-    platforms: ["linux"]
-    internal: true
     dir: ./libs/langserver
+    internal: true
+    platforms: ["linux", "darwin"]
     cmds:
       - ../compiler/odin build src/ -collection:shared=src -out:ols -o:speed
-    source:
+    sources:
       - "./**/*.odin"
     generates:
       - "ols"
