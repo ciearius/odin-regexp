@@ -1,4 +1,4 @@
-package suite
+package describe
 
 import "core:testing"
 import "core:slice"
@@ -9,12 +9,25 @@ import "../tokenizer"
 import "../bytecode"
 import "../compiler"
 
+print_tokens :: proc(t: ^testing.T, title: string, tokens: []tokenizer.Token) {
+	testing.log(t, title)
+	for token in tokens {
+		testing.logf(t, "%v %v", token.value, token.ttype)
+	}
+}
 
-describe_tokenizer_test :: proc(t: ^testing.T, input: string, expected_tokens: ..tokenizer.Token) {
+tokenizer_test :: proc(t: ^testing.T, input: string, expected_tokens: ..tokenizer.Token) {
 	using testing
 
 	// TOKENIZER
 	tokens := tokenizer.tokenize(input)
+
+	if len(expected_tokens) != len(tokens) {
+		fail(t)
+		print_tokens(t, "want:", expected_tokens)
+		print_tokens(t, "have:", tokens)
+		return
+	}
 
 	for actual, i in tokens {
 		expected := expected_tokens[i]
@@ -23,7 +36,7 @@ describe_tokenizer_test :: proc(t: ^testing.T, input: string, expected_tokens: .
 	}
 }
 
-describe_parser_test :: proc(t: ^testing.T, input: []tokenizer.Token, expected_tree: ast.Node) {
+parser_test :: proc(t: ^testing.T, input: []tokenizer.Token, expected_tree: ast.Node) {
 	using testing
 
 	// PARSER
@@ -34,7 +47,7 @@ describe_parser_test :: proc(t: ^testing.T, input: []tokenizer.Token, expected_t
 	// TODO: walk tree
 }
 
-describe_compiler_test :: proc(
+compiler_test :: proc(
 	t: ^testing.T,
 	input: ast.Node,
 	expected_charsets: []compiler.Charset,
@@ -72,4 +85,12 @@ describe_compiler_test :: proc(
 
 		testing.fail(t)
 	}
+}
+
+token :: proc(tt: tokenizer.TokenType, value: ..rune) -> tokenizer.Token {
+	return tokenizer.Token{tt, value, {}}
+}
+
+token_EOF :: proc() -> tokenizer.Token {
+	return tokenizer.Token{ttype = .EOF}
 }
