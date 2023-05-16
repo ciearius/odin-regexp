@@ -12,9 +12,15 @@ includes:
   ols: ./taskfiles/ols.yml
 
 tasks:
+  pull:
+    desc: "Pull all dependencies."
+    cmds:
+      - task: odin:pull
+      - task: ols:pull
+
   init:
-    deps: [odin:pull, ols:pull]
-    desc: "Download and (if necessary) build all dependencies."
+    deps: [pull]
+    desc: "Build all dependencies."
     cmds:
       - task: odin:init-linux
       - task: ols:init-linux
