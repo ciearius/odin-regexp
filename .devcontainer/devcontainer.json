@@ -2,18 +2,18 @@
 	"name": "odin-dev",
 	"build": {
 		"dockerfile": "Dockerfile"
-	},
-	"customizations": {
-		"vscode": {
-			"extensions": [
-				"DanielGavin.ols",
-				"bierner.markdown-mermaid",
-				"task.vscode-task",
-				"vadimcn.vscode-lldb",
-				"mhutchie.git-graph"
-			]
-		}
-	},
+	}
+	// "customizations": {
+	// 	"vscode": {
+	// 		"extensions": [
+	// 			"DanielGavin.ols",
+	// 			"bierner.markdown-mermaid",
+	// 			"task.vscode-task",
+	// 			"vadimcn.vscode-lldb",
+	// 			"mhutchie.git-graph"
+	// 		]
+	// 	}
+	// },
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "./install.sh"
+	// "postCreateCommand": "./install.sh"
 }

@@ -1,0 +1,12 @@
+{
+	// List of extensions which should be recommended for users of this workspace.
+	"recommendations": [
+		"DanielGavin.ols",
+		"bierner.markdown-mermaid",
+		"task.vscode-task",
+		"vadimcn.vscode-lldb",
+		"mhutchie.git-graph"
+	],
+	// List of extensions recommended by VS Code that should not be recommended for users of this workspace.
+	"unwantedRecommendations": []
+}
