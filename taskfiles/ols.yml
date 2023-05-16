@@ -1,0 +1,29 @@
+version: '3'
+# https://taskfile.dev
+
+shopt: [globstar]
+
+tasks:
+  pull:
+    dir: ./libs
+    cmds:
+      - git clone --depth=1 https://github.com/DanielGavin/ols.git langserver
+    generates:
+      - "langserver"
+    status:
+      - "test -d langserver"
+      - "test -f langserver/README.md"
+
+  init:
+    desc: "Setup the Odin language server."
+    cmds:
+      - task: init-linux
+
+  init-linux:
+    platforms: ["linux"]
+    internal: true
+    dir: ./libs/langserver
+    cmds:
+      - ./build.sh release
+    generates:
+      - "langserver.bin"

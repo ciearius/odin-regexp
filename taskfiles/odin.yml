@@ -4,12 +4,6 @@ version: '3'
 shopt: [globstar]
 
 tasks:
-  init:
-    desc: "Download and (if necessary) build all dependencies."
-    cmds:
-      - task: pull
-      - task: init-linux
-
   pull:
     dir: ./libs
     cmds:
@@ -17,10 +11,15 @@ tasks:
     generates:
       - "compiler"
     status:
+      - "test -d compiler"
       - "test -f compiler/README.md"
 
-  init-linux:
+  init:
     desc: "Setup the Odin language compiler"
+    cmds:
+      - task: init-linux
+
+  init-linux:
     platforms: ["linux"]
     internal: true
     dir: ./libs/compiler

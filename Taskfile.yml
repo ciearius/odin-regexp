@@ -4,8 +4,16 @@ version: '3'
 shopt: [globstar]
 
 includes:
-  odin: ./taskfiles/odin.yml
   build: ./taskfiles/build.yml
   test: ./taskfiles/test.yml
+  odin: ./taskfiles/odin.yml
+  ols: ./taskfiles/ols.yml
 
 tasks:
+  init:
+    desc: "Download and (if necessary) build all dependencies."
+    cmds:
+      - task: odin:pull
+      - task: odin:init-linux
+      - task: ols:pull
+      - task: ols:init-linux
