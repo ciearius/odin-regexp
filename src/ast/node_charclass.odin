@@ -14,6 +14,7 @@ CharClass :: enum {
 
 create_match_char_class :: proc(name: rune) -> ^Match_CharClass {
 	switch name {
+
 	case 'w':
 		return create_match_charclass(.Word)
 	case 'W':
@@ -22,6 +23,7 @@ create_match_char_class :: proc(name: rune) -> ^Match_CharClass {
 		return create_match_charclass(.Digit)
 	case 'D':
 		return create_match_charclass(.Digit, true)
+
 	}
 
 	fmt.panicf("%r is not a valid char class")

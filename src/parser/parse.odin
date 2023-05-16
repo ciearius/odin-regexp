@@ -35,6 +35,10 @@ parse_expression :: proc(ps: ^ParseState) -> (res: ast.Node, err: ParseErr) {
 		return
 	}
 
+	if res = parse_escaped(ps) or_return; res != nil {
+		return
+	}
+
 	if res = parse_grouping(ps) or_return; res != nil {
 		return
 	}
@@ -44,10 +48,6 @@ parse_expression :: proc(ps: ^ParseState) -> (res: ast.Node, err: ParseErr) {
 	}
 
 	if res = parse_match(ps) or_return; res != nil {
-		return
-	}
-
-	if res = parse_escaped(ps) or_return; res != nil {
 		return
 	}
 
@@ -192,6 +192,8 @@ parse_escaped :: proc(ps: ^ParseState) -> (n: ast.Node, err: ParseErr) {
 	if ps.curr.ttype != .Escaped {
 		return nil, .None
 	}
+
+	defer advance(ps)
 
 	return ast.create_match_char_class(ps.curr.value[0]), .None
 }

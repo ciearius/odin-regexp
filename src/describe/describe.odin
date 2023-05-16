@@ -44,6 +44,7 @@ parser_test :: proc(t: ^testing.T, input: []tokenizer.Token, expected_tree: ast.
 
 	expect_value(t, err, parser.ParseErr.None)
 
+	// expect_value(t, tree, expected_tree)
 	// TODO: walk tree
 }
 

@@ -13,58 +13,38 @@ import "../src/compiler"
 
 @(test)
 test_charclass_tokenize :: proc(t: ^testing.T) {
-	describe.tokenizer_test(
-		t,
-		`\w`,
-		tokenizer.Token{ttype = .Escaped, value = {'w'}},
-		tokenizer.Token{ttype = .EOF},
-	)
+	describe.tokenizer_test(t, `\w`, describe.token(.Escaped, 'w'), describe.token_EOF())
 
-	describe.tokenizer_test(
-		t,
-		`\W`,
-		tokenizer.Token{ttype = .Escaped, value = {'W'}},
-		tokenizer.Token{ttype = .EOF},
-	)
+	describe.tokenizer_test(t, `\W`, describe.token(.Escaped, 'W'), describe.token_EOF())
 
-	describe.tokenizer_test(
-		t,
-		`\d`,
-		tokenizer.Token{ttype = .Escaped, value = {'d'}},
-		tokenizer.Token{ttype = .EOF},
-	)
+	describe.tokenizer_test(t, `\d`, describe.token(.Escaped, 'd'), describe.token_EOF())
 
-	describe.tokenizer_test(
-		t,
-		`\D`,
-		tokenizer.Token{ttype = .Escaped, value = {'D'}},
-		tokenizer.Token{ttype = .EOF},
-	)
+	describe.tokenizer_test(t, `\D`, describe.token(.Escaped, 'D'), describe.token_EOF())
 }
 
 @(test)
 test_charclass_parse :: proc(t: ^testing.T) {
 	describe.parser_test(
 		t,
-		{tokenizer.Token{ttype = .Escaped, value = {'w'}}, tokenizer.Token{ttype = .EOF}},
+		{describe.token(.Escaped, 'w'), describe.token_EOF()},
 		ast.create_match_charclass(.Word, false),
 	)
 
 	describe.parser_test(
 		t,
-		{tokenizer.Token{ttype = .Escaped, value = {'W'}}, tokenizer.Token{ttype = .EOF}},
+		{describe.token(.Escaped, 'W'), describe.token_EOF()},
 		ast.create_match_charclass(.Word, true),
 	)
 
 	describe.parser_test(
 		t,
-		{tokenizer.Token{ttype = .Escaped, value = {'d'}}, tokenizer.Token{ttype = .EOF}},
+		{describe.token(.Escaped, 'd'), describe.token_EOF()},
 		ast.create_match_charclass(.Digit, false),
 	)
 
 	describe.parser_test(
 		t,
-		{tokenizer.Token{ttype = .Escaped, value = {'D'}}, tokenizer.Token{ttype = .EOF}},
+		{describe.token(.Escaped, 'D'), describe.token_EOF()},
 		ast.create_match_charclass(.Digit, true),
 	)
 }

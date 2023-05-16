@@ -22,6 +22,6 @@ test_tokenize_0 :: proc(t: ^testing.T) {
 		describe.token(.Alphanumeric, 'Z'),
 		describe.token(.Close_Bracket, ']'),
 		describe.token(.Plus, '+'),
-		describe.token(.EOF),
+		describe.token_EOF(),
 	)
 }
