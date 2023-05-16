@@ -24,6 +24,8 @@ tasks:
     internal: true
     dir: ./libs/langserver
     cmds:
-      - ./build.sh release
+      - ../compiler/odin build src/ -collection:shared=src -out:ols -o:speed
+    source:
+      - "./**/*.odin"
     generates:
-      - "langserver.bin"
+      - "ols"
