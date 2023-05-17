@@ -13,3 +13,8 @@ tasks:
     desc: "Build with no optimization."
     cmds:
       - "./libs/compiler/odin build ./src -o:none -out=oregexp{{exeExt}}"
+
+  debug:
+    desc: "Build for debugging."
+    cmds:
+      - "./libs/compiler/odin build ./src -debug -out:debug.bin"
