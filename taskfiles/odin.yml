@@ -18,6 +18,7 @@ tasks:
     desc: "Setup the Odin language compiler"
     cmds:
       - task: init-linux
+      - task: init-windows
 
   init-linux:
     dir: ./libs/compiler
@@ -36,3 +37,17 @@ tasks:
       - "**/*.odin"
     generates:
       - "odin"
+
+  init-windows:
+    dir: ./libs/compiler
+    internal: true
+    platforms: ["windows"]
+    deps: [pull]
+    silent: false
+    cmds:
+      - '"{{.USER_WORKING_DIR}}\taskfiles\chain.bat" "{{.VCVAR64}}" "{{.USER_WORKING_DIR}}\libs\compiler\build.bat"'
+    sources:
+      - "**/*.cpp"
+      - "**/*.odin"
+    generates:
+      - "odin.exe"

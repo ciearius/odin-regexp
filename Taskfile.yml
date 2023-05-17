@@ -22,5 +22,5 @@ tasks:
     deps: [pull]
     desc: "Build all dependencies."
     cmds:
-      - task: odin:init-linux
-      - task: ols:init-linux
+      - task: odin:init
+      - task: ols:init
