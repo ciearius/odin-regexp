@@ -16,70 +16,71 @@ code_from_concatenation :: proc(c: ^ConstBuilder, node: ^ast.Concatenation) -> S
 	return gen[:]
 }
 
-calc_b0 :: #force_inline proc(blocks: []Snippet) -> []int {
-	b0 := make([]int, len(blocks))
-
-	for block, idx in blocks {
-		if idx == 0 {
-			continue
-		}
-		b0[idx] = b0[idx - 1] + len(blocks[idx - 1])
-	}
-
-	return b0
-}
-
-generate_alternation_header :: #force_inline proc(b0: []int) -> Snippet {
-	bCount := len(b0)
-	hCount := bCount - 1
-
-	code := make(Snippet, hCount)
-
-	for i in 0 ..< hCount {
-		index := b0[i] + hCount
-		code[i] = bytecode.instr_split(index, 1)
-	}
-
-	last_header := hCount - 1
-	code[last_header].split[1] = b0[hCount] + hCount
-
-	return code
-}
-
 code_from_alternation :: proc(cb: ^ConstBuilder, node: ^ast.Alternation) -> Snippet {
-	blockCount := len(node.nodes)
-	hCount := blockCount - 1
+	n := len(node.nodes)
 
-	if blockCount < 2 {
-		panic("cant alternate a single path")
-	}
+	// check state
+	assert(n >= 2, "cant have a an alternation with less than two paths")
 
-	blocks := make([]Snippet, blockCount)
+	// compile children
+	blocks := get_blocks(cb, node.nodes)
 
-	for rawBlock, i in node.nodes {
-		code := code_from(cb, rawBlock)
+	// pointer to end
+	end := slice.reduce(blocks, 2 * (n - 1), proc(prev: int, curr: Snippet) -> int {
+		return prev + len(curr)
+	})
 
-		// Append jump instruction to all but the last block
-		if blockCount - 1 != i {
-			code = append_instr(code, bytecode.instr_jump(-1))
+	offset_sum := n - 1
+
+	// adding jump to end
+	for block, b in blocks {
+		offset_by(&blocks[b], offset_sum)
+
+		if b == len(node.nodes) - 1 {
+			break
 		}
 
-		blocks[i] = code
+		blocks[b] = append_instr(block, bytecode.instr_jump(end))
+		offset_sum += (len(block) + 1)
 	}
 
-	b0 := calc_b0(blocks)
+	header := make(Snippet, n - 1)
 
-	header := generate_alternation_header(b0)
+	blockPointers := make([]int, n)
 
-	last_block_idx := len(b0) - 1
-	full_offset := b0[last_block_idx]
-	block: Snippet
+	blockPointers[0] = n - 1
 
-	for i in 0 ..< last_block_idx {
-		block = blocks[i]
-
-		block[len(block) - 1].idx = full_offset - b0[i]
+	for i in 1 ..< n {
+		blockPointers[i] = len(blocks[i - 1]) + blockPointers[i - 1]
 	}
+
+	for i in 0 ..< n - 2 {
+		header[i] = bytecode.instr_split(blockPointers[i], i + 1)
+	}
+
+	header[n - 2] = bytecode.instr_split(blockPointers[n - 2], blockPointers[n - 1])
 
 	return slice.concatenate([]Snippet{header, slice.concatenate(blocks)})
+}
+
+get_blocks :: proc(cb: ^ConstBuilder, nodes: []ast.Node) -> (blocks: []Snippet) {
+	blocks = make([]Snippet, len(nodes))
+
+	for n, i in nodes {
+		blocks[i] = code_from(cb, n)
+	}
+
+	return
+}
+
+offset_by :: proc(s: ^Snippet, value: int) {
+	for i, idx in s {
+		#partial switch i.code {
+		case .JUMP:
+			s[idx].idx += value
+		case .SPLIT:
+			s[idx].split[0] += value
+			s[idx].split[1] += value
+		}
+	}
 }

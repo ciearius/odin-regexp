@@ -23,10 +23,12 @@ create_snippet :: proc(ii: ..bytecode.Instruction) -> Snippet {
 	return s
 }
 
+@(require_results)
 append_instr :: proc(snip: Snippet, ii: ..bytecode.Instruction) -> Snippet {
 	return slice.concatenate([]Snippet{snip, ii})
 }
 
+@(require_results)
 prepend_instr :: proc(snip: Snippet, ii: ..bytecode.Instruction) -> Snippet {
 	return slice.concatenate([]Snippet{ii, snip})
 }

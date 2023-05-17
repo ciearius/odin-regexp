@@ -23,8 +23,8 @@ run :: proc(code: []b.Instruction, sets: []c.Charset, input: []rune) -> bool #no
 			ip += instr.idx
 
 		case .SPLIT:
-			stack_push(stack, ip + instr.split[1], sp)
-			ip += instr.split[0]
+			stack_push(stack, instr.split[1], sp)
+			ip = instr.split[0]
 
 		case .CHAR:
 			if instr.char == curr {

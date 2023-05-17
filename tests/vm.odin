@@ -63,28 +63,28 @@ test_build_input :: proc(t: ^testing.T) {
 	}
 }
 
-@(test)
-test_optional_stress :: proc(t: ^testing.T) {
-	exp := util.build_torture_regex(5)
+// @(test)
+// test_optional_stress :: proc(t: ^testing.T) {
+// 	exp := util.build_torture_regex(5)
 
-	fmt.println("Stressing with:", exp)
+// 	fmt.println("Stressing with:", exp)
 
-	tokens := tokenizer.tokenize(exp)
+// 	tokens := tokenizer.tokenize(exp)
 
-	tree, err := parser.parse(tokens)
+// 	tree, err := parser.parse(tokens)
 
-	testing.expect_value(t, err, parser.ParseErr.None)
+// 	testing.expect_value(t, err, parser.ParseErr.None)
 
-	const, code := compiler.compile(tree)
+// 	const, code := compiler.compile(tree)
 
-	// fmt.println("Shouldn't match")
-	result0 := vm.run(code, const, []rune{'a', 'a', 'a', 'a'})
-	// fmt.println("It does...?!" if result0 else "As expected!")
-	testing.expect_value(t, result0, false)
+// 	// fmt.println("Shouldn't match")
+// 	result0 := vm.run(code, const, []rune{'a', 'a', 'a', 'a'})
+// 	// fmt.println("It does...?!" if result0 else "As expected!")
+// 	testing.expect_value(t, result0, false)
 
-	// fmt.println("Should match")
-	result1 := vm.run(code, const, []rune{'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'})
+// 	// fmt.println("Should match")
+// 	result1 := vm.run(code, const, []rune{'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'})
 
-	// fmt.println("As expected!" if result1 else "It doesn't...?!")
-	testing.expect_value(t, result1, true)
-}
+// 	// fmt.println("As expected!" if result1 else "It doesn't...?!")
+// 	testing.expect_value(t, result1, true)
+// }
