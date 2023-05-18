@@ -1,5 +1,8 @@
 package tokenizer
 
+import "core:fmt"
+
+
 TokenType :: enum {
 	// TODO: Add whitespace
 
@@ -36,4 +39,8 @@ Token :: struct {
 
 create_token :: proc(ttype: TokenType, value: []rune, pos: Pos) -> Token {
 	return Token{ttype, value, pos}
+}
+
+to_string :: proc(t: Token) -> string {
+	return fmt.aprintf("%v %v", t.ttype, t.value)
 }

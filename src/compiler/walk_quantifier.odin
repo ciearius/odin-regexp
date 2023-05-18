@@ -7,7 +7,7 @@ import "../bytecode"
 code_from_optional :: proc(c: ^ConstBuilder, node: ^ast.Optional) -> Snippet {
 	content := code_from(c, node.content)
 
-	c2 := bytecode.instr_split(1, len(content))
+	c2 := bytecode.instr_split(1, len(content) + 1)
 
 	offset_by(&content, 1)
 

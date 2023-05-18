@@ -28,17 +28,17 @@ main :: proc() {
 		res0 := execute(exp, input0)
 		time.stopwatch_stop(track_valid)
 
-		assert(res0, "expected a match!")
+		assert(res0, "should match")
 		delete(input0)
 
 		// Checking non-matching input
 		input1 := util.build_input(nLen - 1, 'a')
 
 		time.stopwatch_start(track_invalid)
-		res1 := execute(exp, input0)
+		res1 := execute(exp, input1)
 		time.stopwatch_stop(track_invalid)
 
-		assert(!res1, "expected no match!")
+		assert(!res1, "shouldn't match")
 		delete(input1)
 	}
 

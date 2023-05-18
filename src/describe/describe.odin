@@ -2,12 +2,15 @@ package describe
 
 import "core:testing"
 import "core:slice"
+import "core:fmt"
+import "core:runtime"
 
 import "../ast"
 import "../parser"
 import "../tokenizer"
 import "../bytecode"
 import "../compiler"
+import "../vm"
 
 print_tokens :: proc(
 	t: ^testing.T,
@@ -18,8 +21,12 @@ print_tokens :: proc(
 	testing.log(t, title)
 
 	for token in tokens {
-		testing.logf(t, "%v %v", token.value, token.ttype, loc)
+		testing.log(t, tokenizer.to_string(token))
 	}
+}
+
+summary :: proc(t: ^testing.T, loc := #caller_location) {
+	testing.log(t, ("[+]" if !testing.failed(t) else "[-]"), loc.procedure)
 }
 
 tokenizer_test :: proc(
@@ -30,20 +37,28 @@ tokenizer_test :: proc(
 ) {
 	using testing
 
-	// TOKENIZER
 	tokens := tokenizer.tokenize(input)
 
-	if len(expected_tokens) != len(tokens) {
-		fail(t, loc)
+	defer if testing.failed(t) {
 		print_tokens(t, "want:", expected_tokens)
 		print_tokens(t, "have:", tokens)
+	}
+
+	if !testing.expect_value(t, len(tokens), len(expected_tokens), loc) {
 		return
 	}
 
 	for actual, i in tokens {
 		expected := expected_tokens[i]
-		expect_value(t, actual.ttype, expected.ttype)
-		expect(t, slice.equal(actual.value, expected.value))
+		ok :=
+			expect_value(t, actual.ttype, expected.ttype, loc) &&
+			expect(t, slice.equal(actual.value, expected.value), "", loc)
+
+		if !ok {
+			testing.log(t, "mismatch at:", i)
+			testing.log(t, tokenizer.to_string(actual))
+			testing.log(t, tokenizer.to_string(expected))
+		}
 	}
 }
 
@@ -55,7 +70,6 @@ parser_test :: proc(
 ) {
 	using testing
 
-	// PARSER
 	tree, err := parser.parse(input)
 
 	expect_value(t, err, parser.ParseErr.None, loc)
@@ -71,7 +85,6 @@ compiler_test :: proc(
 	expected_code: ..bytecode.Instruction,
 	loc := #caller_location,
 ) {
-	// COMPILER
 	charsets, code := compiler.compile(input)
 
 	defer if testing.failed(t) {
@@ -87,8 +100,8 @@ compiler_test :: proc(
 	}
 
 	if !testing.expect_value(t, len(charsets), len(expected_charsets)) {
-		testing.log(t, "Expected", expected_charsets)
-		testing.log(t, "Actual", charsets)
+		testing.log(t, "Expected", expected_charsets, loc)
+		testing.log(t, "Actual", charsets, loc)
 		return
 	}
 
@@ -101,13 +114,26 @@ compiler_test :: proc(
 		)
 	}
 
-	if !testing.expect_value(t, len(code), len(expected_code)) {
+	if !testing.expect_value(t, len(code), len(expected_code), loc) {
 		return
 	}
 
 	for actual_instruction, instrIndex in code {
 		testing.expect_value(t, actual_instruction, expected_code[instrIndex], loc)
 	}
+}
+
+vm_test :: proc(
+	t: ^testing.T,
+	input_code: []bytecode.Instruction,
+	input_sets: []compiler.Charset,
+	input_str: []rune,
+	expected_outcome: bool,
+	loc := #caller_location,
+) {
+	actual := vm.run(input_code, input_sets, input_str)
+
+	testing.expect_value(t, actual, expected_outcome, loc)
 }
 
 token :: proc(tt: tokenizer.TokenType, value: ..rune) -> tokenizer.Token {

@@ -9,8 +9,13 @@ import "../bytecode"
 code_from_concatenation :: proc(c: ^ConstBuilder, node: ^ast.Concatenation) -> Snippet {
 	gen := make([dynamic]bytecode.Instruction)
 
+	sum := 0
+
 	for n in node.nodes {
-		append(&gen, ..code_from(c, n))
+		content := code_from(c, n)
+		offset_by(&content, sum)
+		append(&gen, ..content)
+		sum += len(content)
 	}
 
 	return gen[:]
